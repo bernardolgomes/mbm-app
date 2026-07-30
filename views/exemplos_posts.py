@@ -1,7 +1,8 @@
 import streamlit as st
-from utils import setup_page, listar_fotos, guardar_foto, apagar_foto
+from utils import setup_page, listar_fotos, guardar_foto, apagar_foto, pode_editar
 
 cliente, dados, accent = setup_page("Exemplos de Posts")
+editavel = pode_editar()
 
 st.markdown("# Exemplos de Posts")
 st.write(f"Sugestões de conteúdo para **{cliente}**. Envia fotos para cada tipo de publicação.")
@@ -49,23 +50,24 @@ for i, (titulo, legenda) in enumerate(lista):
             for j, caminho in enumerate(fotos):
                 with sub_cols[j % 2]:
                     st.image(str(caminho), use_container_width=True)
-                    if st.button("🗑️", key=f"remover-{titulo}-{caminho.name}", help="Remover"):
+                    if editavel and st.button("🗑️", key=f"remover-{titulo}-{caminho.name}", help="Remover"):
                         apagar_foto(caminho)
                         st.rerun()
         else:
             st.caption("Ainda sem fotos para esta legenda.")
 
-        with st.expander("➕ Enviar imagens"):
-            novos = st.file_uploader(
-                f"Enviar fotos para: {titulo}",
-                type=["png", "jpg", "jpeg", "webp"],
-                accept_multiple_files=True,
-                key=f"upload-{titulo}",
-                label_visibility="collapsed",
-            )
-            if novos:
-                for f in novos:
-                    guardar_foto(cliente, titulo, f.name, f.getbuffer())
-                st.rerun()
+        if editavel:
+            with st.expander("➕ Enviar imagens"):
+                novos = st.file_uploader(
+                    f"Enviar fotos para: {titulo}",
+                    type=["png", "jpg", "jpeg", "webp"],
+                    accept_multiple_files=True,
+                    key=f"upload-{titulo}",
+                    label_visibility="collapsed",
+                )
+                if novos:
+                    for f in novos:
+                        guardar_foto(cliente, titulo, f.name, f.getbuffer())
+                    st.rerun()
 
         st.markdown("</div>", unsafe_allow_html=True)

@@ -1,12 +1,16 @@
 import streamlit as st
 from datetime import date
 import calendar as cal
-from utils import setup_page, carregar_calendario, guardar_calendario
+from utils import setup_page, carregar_calendario, guardar_calendario, pode_editar
 
 cliente, dados, accent = setup_page("Calendário de Publicação")
+editavel = pode_editar()
 
 st.markdown("# Calendário de Publicação")
-st.write("Escolhe o mês e o tipo de conteúdo para cada dia. Fica tudo gravado por cliente.")
+if editavel:
+    st.write("Escolhe o mês e o tipo de conteúdo para cada dia. Fica tudo gravado por cliente.")
+else:
+    st.write("A ver em modo visitante. Inicia sessão para editar o calendário.")
 st.markdown("")
 
 TIPOS = ["—", "📸 Post", "🎬 Reel", "📝 Story", "🎉 Promoção"]
@@ -65,8 +69,9 @@ for semana in semanas:
                 index=TIPOS.index(valor_atual) if valor_atual in TIPOS else 0,
                 key=f"sel-{chave}",
                 label_visibility="collapsed",
+                disabled=not editavel,
             )
-            if escolha != valor_atual:
+            if editavel and escolha != valor_atual:
                 calendario[chave] = escolha
                 alterou = True
 

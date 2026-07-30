@@ -1,7 +1,8 @@
 import streamlit as st
-from utils import setup_page, NEGOCIOS_MOCKUP, listar_mockups, guardar_mockup, apagar_foto
+from utils import setup_page, NEGOCIOS_MOCKUP, listar_mockups, guardar_mockup, apagar_foto, pode_editar
 
 setup_page("Mockups", mostrar_cliente=False)
+editavel = pode_editar()
 
 st.markdown("# Mockups")
 st.write("Exemplos reais de trabalhos que já fizemos, para demonstrar o tipo de conteúdo que criamos para cada setor.")
@@ -26,23 +27,24 @@ for i, (icone, negocio) in enumerate(NEGOCIOS_MOCKUP):
             for j, caminho in enumerate(fotos):
                 with sub_cols[j % 2]:
                     st.image(str(caminho), use_container_width=True)
-                    if st.button("🗑️", key=f"remover-mockup-{negocio}-{caminho.name}", help="Remover"):
+                    if editavel and st.button("🗑️", key=f"remover-mockup-{negocio}-{caminho.name}", help="Remover"):
                         apagar_foto(caminho)
                         st.rerun()
         else:
             st.caption("Ainda sem exemplos.")
 
-        with st.expander("➕ Enviar imagens"):
-            novos = st.file_uploader(
-                f"Enviar mockups para: {negocio}",
-                type=["png", "jpg", "jpeg", "webp"],
-                accept_multiple_files=True,
-                key=f"upload-mockup-{negocio}",
-                label_visibility="collapsed",
-            )
-            if novos:
-                for f in novos:
-                    guardar_mockup(negocio, f.name, f.getbuffer())
-                st.rerun()
+        if editavel:
+            with st.expander("➕ Enviar imagens"):
+                novos = st.file_uploader(
+                    f"Enviar mockups para: {negocio}",
+                    type=["png", "jpg", "jpeg", "webp"],
+                    accept_multiple_files=True,
+                    key=f"upload-mockup-{negocio}",
+                    label_visibility="collapsed",
+                )
+                if novos:
+                    for f in novos:
+                        guardar_mockup(negocio, f.name, f.getbuffer())
+                    st.rerun()
 
         st.markdown("</div>", unsafe_allow_html=True)

@@ -1,7 +1,11 @@
 import streamlit as st
-from utils import NOME_NEGOCIO, setup_page
+from utils import NOME_NEGOCIO, setup_page, render_login
 
 cliente, dados, accent = setup_page("Início", mostrar_cliente=False)
+
+_, col_login = st.columns([3, 1])
+with col_login:
+    render_login("home")
 
 # ---------------------------------------------------------------------------
 # HERO

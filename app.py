@@ -1,5 +1,5 @@
 import streamlit as st
-from utils import NOME_NEGOCIO, render_marca_sidebar, render_cliente_selector, render_sair_button, login_gate
+from utils import NOME_NEGOCIO, render_marca_sidebar, render_cliente_selector, render_login, login_gate
 
 st.set_page_config(
     page_title=NOME_NEGOCIO,
@@ -8,7 +8,8 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Bloqueia todo o resto da app até haver login válido.
+# Garante o estado de sessão. A app fica sempre visível (modo visitante);
+# só as ações de edição exigem sessão iniciada.
 login_gate()
 
 # Os títulos ficam definidos aqui, no código, não dependem do nome do ficheiro,
@@ -49,6 +50,6 @@ with st.sidebar:
         st.page_link(pagina)
 
     st.markdown("---")
-    render_sair_button()
+    render_login("sidebar")
 
 navegacao.run()
