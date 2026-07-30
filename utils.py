@@ -80,6 +80,29 @@ def apagar_foto(caminho: Path):
 
 
 # ---------------------------------------------------------------------------
+# MOCKUPS / PORTEFÓLIO — exemplos de trabalhos reais, independentes de cliente
+# ---------------------------------------------------------------------------
+NEGOCIOS_MOCKUP = [
+    ("💊", "Farmácia 1"),
+    ("💊", "Farmácia 2"),
+    ("🍽️", "Restaurante"),
+    ("🏡", "Alojamento Local"),
+    ("📚", "Centro de Estudos"),
+    ("🏠", "Agência Imobiliária"),
+]
+
+_CHAVE_PORTEFOLIO = "_portefolio"
+
+
+def listar_mockups(negocio: str) -> list[Path]:
+    return listar_fotos(_CHAVE_PORTEFOLIO, negocio)
+
+
+def guardar_mockup(negocio: str, nome_ficheiro: str, conteudo: bytes) -> Path:
+    return guardar_foto(_CHAVE_PORTEFOLIO, negocio, nome_ficheiro, conteudo)
+
+
+# ---------------------------------------------------------------------------
 # CLIENTES — base fixa (exemplos) + clientes adicionados por ti (guardados em disco)
 # ---------------------------------------------------------------------------
 CLIENTES_BASE = {
@@ -334,75 +357,82 @@ def render_marca_pagina(accent: str):
     )
 
 
-def sidebar_client_selector() -> str:
-    """Mostra o seletor de cliente (só para admin) e o botão de sair. Devolve o cliente escolhido."""
+def garantir_cliente_valido():
+    """Garante que existe sempre um cliente válido em session_state. Chamar cedo em cada rerun."""
     clientes = todos_clientes()
     bloqueado = st.session_state.get("cliente_bloqueado")
-
     if "cliente" not in st.session_state or st.session_state.cliente not in clientes:
         st.session_state.cliente = bloqueado or list(clientes.keys())[0]
 
-    with st.sidebar:
-        if bloqueado:
-            # Acesso de cliente: fica preso ao seu próprio cliente, sem ver os outros.
-            st.markdown('<div class="sidebar-label">A ver</div>', unsafe_allow_html=True)
-            st.markdown(f"**{bloqueado}**")
-        else:
-            # Acesso de admin: pode trocar de cliente e gerir a lista.
-            st.markdown('<div class="sidebar-label">Cliente selecionado</div>', unsafe_allow_html=True)
-            nomes = list(clientes.keys())
-            cliente_sel = st.selectbox(
-                "Cliente",
-                nomes,
-                index=nomes.index(st.session_state.cliente),
-                label_visibility="collapsed",
-            )
-            st.session_state.cliente = cliente_sel
 
-            st.markdown("---")
+def render_cliente_selector():
+    """Mostra o seletor de cliente (ou o cliente fixo, se for acesso de cliente).
+    Chamar em app.py, dentro de 'with st.sidebar:', no sítio exato onde deve aparecer."""
+    clientes = todos_clientes()
+    bloqueado = st.session_state.get("cliente_bloqueado")
+    garantir_cliente_valido()
 
-            with st.expander("➕ Adicionar novo cliente"):
-                with st.form("form_novo_cliente", clear_on_submit=True):
-                    novo_nome = st.text_input("Nome do cliente")
-                    novo_nicho = st.selectbox("Nicho", NICHOS)
-                    novo_plano = st.selectbox("Plano escolhido", list(PLANOS.keys()))
-                    nova_data = st.date_input("Cliente desde", value=date.today())
-                    nova_cor = st.selectbox("Cor de identificação", CORES_DISPONIVEIS)
-                    nova_senha = st.text_input("Palavra-passe de acesso do cliente")
-                    submeter = st.form_submit_button("Adicionar cliente")
+    if bloqueado:
+        # Acesso de cliente: fica preso ao seu próprio cliente, sem ver os outros.
+        st.markdown('<div class="sidebar-label">A ver</div>', unsafe_allow_html=True)
+        st.markdown(f"**{bloqueado}**")
+        return
 
-                    if submeter:
-                        if not novo_nome.strip():
-                            st.warning("Indica o nome do cliente.")
-                        elif novo_nome in clientes:
-                            st.warning("Já existe um cliente com esse nome.")
-                        elif not nova_senha.strip():
-                            st.warning("Define uma palavra-passe para este cliente.")
-                        else:
-                            guardar_cliente_extra(
-                                nome=novo_nome.strip(),
-                                nicho=novo_nicho,
-                                plano=novo_plano,
-                                desde=nova_data.strftime("%b %Y"),
-                                cor=nova_cor,
-                                senha=nova_senha.strip(),
-                            )
-                            st.session_state.cliente = novo_nome.strip()
-                            st.rerun()
+    # Acesso de admin: pode trocar de cliente e gerir a lista.
+    st.markdown('<div class="sidebar-label">Cliente selecionado</div>', unsafe_allow_html=True)
+    nomes = list(clientes.keys())
+    cliente_sel = st.selectbox(
+        "Cliente",
+        nomes,
+        index=nomes.index(st.session_state.cliente),
+        label_visibility="collapsed",
+    )
+    st.session_state.cliente = cliente_sel
 
-            if cliente_sel not in CLIENTES_BASE:
-                if st.button("🗑️ Remover este cliente"):
-                    remover_cliente_extra(cliente_sel)
-                    st.session_state.cliente = list(CLIENTES_BASE.keys())[0]
+    st.markdown("---")
+
+    with st.expander("➕ Adicionar novo cliente"):
+        with st.form("form_novo_cliente", clear_on_submit=True):
+            novo_nome = st.text_input("Nome do cliente")
+            novo_nicho = st.selectbox("Nicho", NICHOS)
+            novo_plano = st.selectbox("Plano escolhido", list(PLANOS.keys()))
+            nova_data = st.date_input("Cliente desde", value=date.today())
+            nova_cor = st.selectbox("Cor de identificação", CORES_DISPONIVEIS)
+            nova_senha = st.text_input("Palavra-passe de acesso do cliente")
+            submeter = st.form_submit_button("Adicionar cliente")
+
+            if submeter:
+                if not novo_nome.strip():
+                    st.warning("Indica o nome do cliente.")
+                elif novo_nome in clientes:
+                    st.warning("Já existe um cliente com esse nome.")
+                elif not nova_senha.strip():
+                    st.warning("Define uma palavra-passe para este cliente.")
+                else:
+                    guardar_cliente_extra(
+                        nome=novo_nome.strip(),
+                        nicho=novo_nicho,
+                        plano=novo_plano,
+                        desde=nova_data.strftime("%b %Y"),
+                        cor=nova_cor,
+                        senha=nova_senha.strip(),
+                    )
+                    st.session_state.cliente = novo_nome.strip()
                     st.rerun()
 
-        st.markdown("---")
-        if st.button("🚪 Sair"):
-            st.session_state.autenticado = False
-            st.session_state.cliente_bloqueado = None
+    if cliente_sel not in CLIENTES_BASE:
+        if st.button("🗑️ Remover este cliente"):
+            remover_cliente_extra(cliente_sel)
+            st.session_state.cliente = list(CLIENTES_BASE.keys())[0]
             st.rerun()
 
-    return st.session_state.cliente
+
+def render_sair_button():
+    """Botão de logout. Chamar em app.py, dentro de 'with st.sidebar:'."""
+    if st.button("🚪 Sair"):
+        st.session_state.autenticado = False
+        st.session_state.cliente_bloqueado = None
+        st.rerun()
 
 
 def render_header(cliente: str, dados: dict, accent: str):
@@ -433,8 +463,10 @@ def render_header(cliente: str, dados: dict, accent: str):
 
 
 def setup_page(page_title: str) -> tuple[str, dict, str]:
-    """Chamar no topo de cada página: configura CSS, sidebar e header. Devolve (cliente, dados, accent)."""
-    cliente = sidebar_client_selector()
+    """Chamar no topo de cada página: configura CSS e header. Devolve (cliente, dados, accent).
+    O seletor de cliente é desenhado à parte, em app.py."""
+    garantir_cliente_valido()
+    cliente = st.session_state.cliente
     dados = todos_clientes()[cliente]
     accent = dados["cor"]
     inject_css(accent)

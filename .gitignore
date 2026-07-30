@@ -2,4 +2,8 @@ __pycache__/
 *.pyc
 .venv/
 .DS_Store
-dados_clientes/
+
+# Ignora os dados de clientes (calendários, fotos, senhas), mas mantém o
+# portefólio de mockups, que deve ir para o site ao vivo.
+dados_clientes/*
+!dados_clientes/_portefolio
