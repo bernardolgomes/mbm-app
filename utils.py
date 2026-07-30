@@ -126,7 +126,16 @@ PLANOS = {
     "Plano Premium": {"posts_mes": 8, "stories_mes": 8},
 }
 
-CORES_DISPONIVEIS = ["#4FD1C5", "#F6AD55", "#F56565", "#68D391", "#63B3ED", "#B794F4", "#F687B3"]
+# (hex, emoji de amostra, nome em português) — mostrado no seletor de cor do cliente
+CORES_DISPONIVEIS = [
+    ("#4FD1C5", "🟦", "Turquesa"),
+    ("#F6AD55", "🟧", "Laranja"),
+    ("#F56565", "🟥", "Vermelho"),
+    ("#68D391", "🟩", "Verde"),
+    ("#63B3ED", "🟦", "Azul"),
+    ("#B794F4", "🟪", "Roxo"),
+    ("#F687B3", "🩷", "Rosa"),
+]
 
 
 def carregar_clientes_extra() -> dict:
@@ -370,7 +379,11 @@ def render_cliente_selector():
             novo_nicho = st.selectbox("Nicho", NICHOS)
             novo_plano = st.selectbox("Plano escolhido", list(PLANOS.keys()))
             nova_data = st.date_input("Cliente desde", value=date.today())
-            nova_cor = st.selectbox("Cor de identificação", CORES_DISPONIVEIS)
+            nova_cor_opcao = st.selectbox(
+                "Cor de identificação",
+                CORES_DISPONIVEIS,
+                format_func=lambda opcao: f"{opcao[1]} {opcao[2]}",
+            )
             nova_senha = st.text_input("Palavra-passe de acesso do cliente")
             submeter = st.form_submit_button("Adicionar cliente")
 
@@ -387,7 +400,7 @@ def render_cliente_selector():
                         nicho=novo_nicho,
                         plano=novo_plano,
                         desde=nova_data.strftime("%b %Y"),
-                        cor=nova_cor,
+                        cor=nova_cor_opcao[0],
                         senha=nova_senha.strip(),
                     )
                     st.session_state.cliente = novo_nome.strip()
@@ -409,29 +422,32 @@ def render_sair_button():
 
 
 def render_header(cliente: str, dados: dict, accent: str):
+    """Nota técnica: isto é construído numa única linha de propósito. Se houver uma
+    linha em branco a meio de um bloco de HTML dentro de um st.markdown, o Streamlit
+    interpreta o resto como texto em bruto em vez de HTML (acontecia quando o cliente
+    não tinha o selo "Cliente real", porque essa linha ficava vazia)."""
     selo_real = (
         '<span class="pill" style="background:#f6ad5522;color:#f6ad55;border-color:#f6ad5555;">⭐ Cliente real</span>'
         if dados.get("real")
         else ""
     )
-    st.markdown(
-        f"""
-        <div style="display:flex;align-items:center;gap:14px;margin-bottom:6px;">
-            <div style="width:40px;height:40px;border-radius:10px;background:{accent};
-                        display:flex;align-items:center;justify-content:center;font-size:20px;">
-                📱
-            </div>
-            <div>
-                <span style="font-size:1.3rem;font-weight:700;">{cliente}</span><br/>
-                <span class="pill">{dados['nicho']}</span>
-                <span class="pill">{dados['plano']}</span>
-                {selo_real}
-                <span style="color:#7c8aa8;font-size:0.85rem;"> cliente desde {dados['desde']}</span>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
+    linha_info = (
+        f'<span class="pill">{dados["nicho"]}</span>'
+        f'<span class="pill">{dados["plano"]}</span>'
+        f'{selo_real}'
+        f'<span style="color:#7c8aa8;font-size:0.85rem;"> cliente desde {dados["desde"]}</span>'
     )
+    html = (
+        '<div style="display:flex;align-items:center;gap:14px;margin-bottom:6px;">'
+        f'<div style="width:40px;height:40px;border-radius:10px;background:{accent};'
+        'display:flex;align-items:center;justify-content:center;font-size:20px;">📱</div>'
+        '<div>'
+        f'<span style="font-size:1.3rem;font-weight:700;">{cliente}</span><br/>'
+        f'{linha_info}'
+        '</div>'
+        '</div>'
+    )
+    st.markdown(html, unsafe_allow_html=True)
     st.markdown("---")
 
 
