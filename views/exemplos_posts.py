@@ -69,5 +69,3 @@ for i, (titulo, legenda) in enumerate(lista):
                 st.rerun()
 
         st.markdown("</div>", unsafe_allow_html=True)
-
-st.info("💡 As fotos ficam associadas à legenda correspondente, para o cliente ver exatamente como cada tipo de post vai ficar.")

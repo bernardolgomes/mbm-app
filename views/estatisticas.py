@@ -37,5 +37,3 @@ random.seed(seed)
 base = seguidores - novos_seguidores
 valores = [base + int(novos_seguidores * i / 6 + random.randint(-5, 5)) for i in range(7)]
 st.line_chart(valores)
-
-st.caption("📌 Em versão real: ligar diretamente à API do Instagram/Facebook para dados ao vivo.")

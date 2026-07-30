@@ -76,4 +76,3 @@ if alterou:
 
 st.markdown("---")
 st.caption(f"Plano contratado: {dados['posts_mes']} publicações + {dados['stories_mes']} stories / mês")
-st.caption("As alterações ficam guardadas por cliente. Muda de mês/ano ou de cliente à vontade, a planificação não se perde.")

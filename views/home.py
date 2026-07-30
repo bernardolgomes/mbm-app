@@ -201,5 +201,3 @@ for c, (titulo, desc) in zip([c1, c2, c3, c4, c5], resumo):
             unsafe_allow_html=True,
         )
 
-st.markdown("---")
-st.caption(f"Demo criada para apresentar o serviço {NOME_NEGOCIO}. Dados fictícios para fins de demonstração.")
