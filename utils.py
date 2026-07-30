@@ -267,33 +267,74 @@ def login_gate():
 
     inject_css(COR_MARCA_VERDE)
 
-    col_esq, col_meio, col_dir = st.columns([1, 1.2, 1])
-    with col_meio:
-        st.markdown(f"## {NOME_NEGOCIO}")
-        st.caption(TAGLINE)
-        st.markdown("")
-        st.markdown("### Acesso")
-        senha = st.text_input("Palavra-passe", type="password", key="login_senha")
-        entrar = st.button("Entrar", use_container_width=True)
+    # Esconde os pequenos ícones de âncora que o Streamlit adiciona a títulos,
+    # e dá um ar de cartão com sombra ao container central.
+    st.markdown(
+        """
+        <style>
+        .stApp a[href^="#"] { display: none !important; }
+        [data-testid="stVerticalBlockBorderWrapper"] {
+            border-radius: 18px !important;
+            border-color: #e5ddc4 !important;
+            box-shadow: 0 12px 30px rgba(38, 51, 43, 0.08);
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
 
-        if entrar:
-            if senha == SENHA_ADMIN:
-                st.session_state.autenticado = True
-                st.session_state.cliente_bloqueado = None
-                st.rerun()
-            else:
-                clientes = todos_clientes()
-                encontrado = next(
-                    (nome for nome, dados in clientes.items() if dados.get("senha") and senha == dados["senha"]),
-                    None,
-                )
-                if encontrado:
+    st.markdown("<div style='height:9vh;'></div>", unsafe_allow_html=True)
+
+    col_esq, col_meio, col_dir = st.columns([1, 1.1, 1])
+    with col_meio:
+        with st.container(border=True):
+            st.markdown(
+                f"""
+                <div style="text-align:center;padding:18px 12px 6px 12px;">
+                    <div style="width:60px;height:60px;border-radius:50%;background:{COR_MARCA_VERDE};
+                                display:flex;align-items:center;justify-content:center;font-size:26px;
+                                margin:0 auto 16px auto;color:#ffffff;">
+                        📱
+                    </div>
+                    <div style="font-size:1.9rem;font-weight:800;color:{COR_TEXTO};">{NOME_NEGOCIO}</div>
+                    <div style="font-size:0.92rem;color:#6b7a70;margin-top:6px;margin-bottom:26px;">{TAGLINE}</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+            senha = st.text_input(
+                "Palavra-passe",
+                type="password",
+                key="login_senha",
+                placeholder="Introduz a tua palavra-passe",
+            )
+            entrar = st.button("Entrar", use_container_width=True)
+
+            if entrar:
+                if senha == SENHA_ADMIN:
                     st.session_state.autenticado = True
-                    st.session_state.cliente_bloqueado = encontrado
-                    st.session_state.cliente = encontrado
+                    st.session_state.cliente_bloqueado = None
                     st.rerun()
                 else:
-                    st.error("Palavra-passe incorreta.")
+                    clientes = todos_clientes()
+                    encontrado = next(
+                        (nome for nome, dados in clientes.items() if dados.get("senha") and senha == dados["senha"]),
+                        None,
+                    )
+                    if encontrado:
+                        st.session_state.autenticado = True
+                        st.session_state.cliente_bloqueado = encontrado
+                        st.session_state.cliente = encontrado
+                        st.rerun()
+                    else:
+                        st.error("Palavra-passe incorreta.")
+
+        st.markdown(
+            "<p style='text-align:center;color:#9aa79c;font-size:0.78rem;margin-top:16px;'>"
+            "Acesso reservado a clientes e administração.</p>",
+            unsafe_allow_html=True,
+        )
 
     st.stop()
 
