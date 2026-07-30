@@ -1,7 +1,7 @@
 import streamlit as st
 from utils import setup_page
 
-cliente, dados, accent = setup_page("Como Funciona")
+cliente, dados, accent = setup_page("Como Funciona", mostrar_cliente=False)
 
 st.markdown("# Como Funciona")
 st.write("O processo completo de gestão das tuas redes sociais, do planeamento aos resultados.")

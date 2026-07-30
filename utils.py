@@ -116,33 +116,6 @@ CLIENTES_BASE = {
         "real": True,
         "senha": "carvoeiro2026",
     },
-    "Farmácia Central": {
-        "cor": "#4FD1C5",
-        "nicho": "Farmácia",
-        "plano": "Plano Start",
-        "desde": "Jan 2026",
-        "posts_mes": 2,
-        "stories_mes": 2,
-        "senha": "central2026",
-    },
-    "Restaurante O Tacho": {
-        "cor": "#F56565",
-        "nicho": "Restauração",
-        "plano": "Plano Start",
-        "desde": "Jun 2026",
-        "posts_mes": 4,
-        "stories_mes": 4,
-        "senha": "otacho2026",
-    },
-    "FitZone Ginásio": {
-        "cor": "#68D391",
-        "nicho": "Ginásio",
-        "plano": "Plano Business",
-        "desde": "Fev 2026",
-        "posts_mes": 8,
-        "stories_mes": 8,
-        "senha": "fitzone2026",
-    },
 }
 
 NICHOS = ["Farmácia", "Restauração", "Ginásio", "Personal Trainer", "Clínica", "Outro"]
@@ -462,14 +435,24 @@ def render_header(cliente: str, dados: dict, accent: str):
     st.markdown("---")
 
 
-def setup_page(page_title: str) -> tuple[str, dict, str]:
+def setup_page(page_title: str, mostrar_cliente: bool = True) -> tuple[str, dict, str]:
     """Chamar no topo de cada página: configura CSS e header. Devolve (cliente, dados, accent).
-    O seletor de cliente é desenhado à parte, em app.py."""
+    O seletor de cliente é desenhado à parte, em app.py.
+
+    mostrar_cliente=False -> página geral, não ligada a nenhum cliente em concreto
+    (não mostra a barra com nome/nicho/plano/cliente desde), usa a cor de marca fixa."""
     garantir_cliente_valido()
     cliente = st.session_state.cliente
     dados = todos_clientes()[cliente]
-    accent = dados["cor"]
-    inject_css(accent)
-    render_marca_pagina(accent)
-    render_header(cliente, dados, accent)
+
+    if mostrar_cliente:
+        accent = dados["cor"]
+        inject_css(accent)
+        render_marca_pagina(accent)
+        render_header(cliente, dados, accent)
+    else:
+        accent = COR_MARCA_VERDE
+        inject_css(accent)
+        render_marca_pagina(accent)
+
     return cliente, dados, accent

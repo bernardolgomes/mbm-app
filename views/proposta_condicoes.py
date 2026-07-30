@@ -1,7 +1,7 @@
 import streamlit as st
 from utils import setup_page
 
-cliente, dados, accent = setup_page("Proposta & Condições")
+cliente, dados, accent = setup_page("Proposta & Condições", mostrar_cliente=False)
 
 st.markdown("# Proposta & Condições")
 st.write("O que está incluído na gestão mensal das redes sociais.")

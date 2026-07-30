@@ -1,7 +1,7 @@
 import streamlit as st
 from utils import NOME_NEGOCIO, setup_page
 
-cliente, dados, accent = setup_page("Início")
+cliente, dados, accent = setup_page("Início", mostrar_cliente=False)
 
 # ---------------------------------------------------------------------------
 # HERO
