@@ -4,13 +4,13 @@ from utils import setup_page, listar_fotos, guardar_foto, apagar_foto
 cliente, dados, accent = setup_page("Exemplos de Posts")
 
 st.markdown("# Exemplos de Posts")
-st.write(f"Sugestões de conteúdo para **{cliente}** — envia fotos para cada tipo de publicação.")
+st.write(f"Sugestões de conteúdo para **{cliente}**. Envia fotos para cada tipo de publicação.")
 st.markdown("")
 
 EXEMPLOS = {
     "Farmácia": [
         ("👩‍⚕️ Apresentação / equipa", "Conhece a equipa da farmácia ou um serviço, ex.: entrega ao domicílio"),
-        ("💊 Dica do farmacêutico", "Conselho de saúde sazonal — alergias, hidratação, gripes"),
+        ("💊 Dica do farmacêutico", "Conselho de saúde sazonal: alergias, hidratação, gripes"),
         ("⭐ Testemunho / prova social", "Feedback de um cliente ou destaque de produto/serviço"),
         ("🎉 Promoção / chamada para ação", "Campanha do mês ou lembrete, ex.: vacinação da gripe"),
     ],
@@ -29,40 +29,45 @@ EXEMPLOS = {
 }
 lista = EXEMPLOS.get(dados["nicho"], EXEMPLOS["Farmácia"])
 
-for titulo, legenda in lista:
+cols = st.columns(3)
+
+for i, (titulo, legenda) in enumerate(lista):
     fotos = listar_fotos(cliente, titulo)
 
-    st.markdown(
-        f"""
-        <div class="card">
-            <b style="font-size:1.05rem;">{titulo}</b>
-            <p style="color:#a9b6d0;font-size:0.9rem;margin-top:4px;">"{legenda}"</p>
-        """,
-        unsafe_allow_html=True,
-    )
+    with cols[i % 3]:
+        st.markdown(
+            f"""
+            <div class="card">
+                <b style="font-size:1.05rem;">{titulo}</b>
+                <p style="color:#6b7a70;font-size:0.85rem;margin-top:4px;">"{legenda}"</p>
+            """,
+            unsafe_allow_html=True,
+        )
 
-    if fotos:
-        cols = st.columns(4)
-        for i, caminho in enumerate(fotos):
-            with cols[i % 4]:
-                st.image(str(caminho), use_container_width=True)
-                if st.button("🗑️ Remover", key=f"remover-{titulo}-{caminho.name}"):
-                    apagar_foto(caminho)
-                    st.rerun()
-    else:
-        st.caption("Ainda sem fotos para esta legenda.")
+        if fotos:
+            sub_cols = st.columns(2)
+            for j, caminho in enumerate(fotos):
+                with sub_cols[j % 2]:
+                    st.image(str(caminho), use_container_width=True)
+                    if st.button("🗑️", key=f"remover-{titulo}-{caminho.name}", help="Remover"):
+                        apagar_foto(caminho)
+                        st.rerun()
+        else:
+            st.caption("Ainda sem fotos para esta legenda.")
 
-    novos = st.file_uploader(
-        f"Enviar fotos para: {titulo}",
-        type=["png", "jpg", "jpeg", "webp"],
-        accept_multiple_files=True,
-        key=f"upload-{titulo}",
-    )
-    if novos:
-        for f in novos:
-            guardar_foto(cliente, titulo, f.name, f.getbuffer())
-        st.rerun()
+        with st.expander("➕ Enviar imagens"):
+            novos = st.file_uploader(
+                f"Enviar fotos para: {titulo}",
+                type=["png", "jpg", "jpeg", "webp"],
+                accept_multiple_files=True,
+                key=f"upload-{titulo}",
+                label_visibility="collapsed",
+            )
+            if novos:
+                for f in novos:
+                    guardar_foto(cliente, titulo, f.name, f.getbuffer())
+                st.rerun()
 
-    st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
 
 st.info("💡 As fotos ficam associadas à legenda correspondente, para o cliente ver exatamente como cada tipo de post vai ficar.")

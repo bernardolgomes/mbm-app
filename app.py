@@ -11,10 +11,10 @@ st.set_page_config(
 # Bloqueia todo o resto da app até haver login válido.
 login_gate()
 
-# Os títulos ficam definidos aqui, no código — não dependem do nome do ficheiro,
+# Os títulos ficam definidos aqui, no código, não dependem do nome do ficheiro,
 # por isso os acentos e emojis aparecem sempre corretamente na barra lateral.
 
-# Páginas gerais/comerciais — não dependem de qual cliente está selecionado.
+# Páginas gerais/comerciais: não dependem de qual cliente está selecionado.
 paginas_gerais = [
     st.Page("views/home.py", title="Início", icon="🏠", default=True),
     st.Page("views/como_funciona.py", title="Como Funciona", icon="🧭"),
@@ -22,7 +22,7 @@ paginas_gerais = [
     st.Page("views/mockups.py", title="Mockups", icon="🖼️"),
 ]
 
-# Páginas operacionais — mostram o conteúdo do cliente selecionado.
+# Páginas operacionais: mostram o conteúdo do cliente selecionado.
 paginas_cliente = [
     st.Page("views/exemplos_posts.py", title="Exemplos de Posts", icon="🎨"),
     st.Page("views/calendario.py", title="Calendário de Publicação", icon="🗓️"),
@@ -31,7 +31,7 @@ paginas_cliente = [
 
 todas_paginas = paginas_gerais + paginas_cliente
 
-# Menu automático escondido — desenhamos os links à mão, para controlar a ordem
+# Menu automático escondido: desenhamos os links à mão, para controlar a ordem
 # exata na sidebar (marca → páginas gerais → cliente selecionado → páginas do cliente).
 navegacao = st.navigation(todas_paginas, position="hidden")
 

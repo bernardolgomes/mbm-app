@@ -12,12 +12,12 @@ import streamlit as st
 NOME_NEGOCIO = "MBM"          # <- muda aqui o nome do teu negócio
 TAGLINE = "Gestão de redes sociais para negócios locais"
 
-# Palavra-passe de administrador — dá acesso a TODOS os clientes e ao seletor.
+# Palavra-passe de administrador, dá acesso a TODOS os clientes e ao seletor.
 # Muda isto antes de partilhares a app com alguém.
 SENHA_ADMIN = "mbm2026"
 
 # ---------------------------------------------------------------------------
-# CORES DE MARCA (fixas — usadas em títulos, botões e destaques em toda a app)
+# CORES DE MARCA (fixas, usadas em títulos, botões e destaques em toda a app)
 # Paleta inspirada em farmácia: creme + verde + turquesa
 # ---------------------------------------------------------------------------
 COR_FUNDO = "#F7F2E7"       # creme
@@ -80,7 +80,7 @@ def apagar_foto(caminho: Path):
 
 
 # ---------------------------------------------------------------------------
-# MOCKUPS / PORTEFÓLIO — exemplos de trabalhos reais, independentes de cliente
+# MOCKUPS / PORTEFÓLIO: exemplos de trabalhos reais, independentes de cliente
 # ---------------------------------------------------------------------------
 NEGOCIOS_MOCKUP = [
     ("💊", "Farmácia 1"),
@@ -103,7 +103,7 @@ def guardar_mockup(negocio: str, nome_ficheiro: str, conteudo: bytes) -> Path:
 
 
 # ---------------------------------------------------------------------------
-# CLIENTES — base fixa (exemplos) + clientes adicionados por ti (guardados em disco)
+# CLIENTES: base fixa (exemplos) + clientes adicionados por ti (guardados em disco)
 # ---------------------------------------------------------------------------
 CLIENTES_BASE = {
     "GRCarvoeiro": {

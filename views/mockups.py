@@ -5,7 +5,7 @@ setup_page("Mockups", mostrar_cliente=False)
 
 st.markdown("# Mockups")
 st.write(
-    "Exemplos reais de trabalhos que já fizemos — para mostrar aos clientes o "
+    "Exemplos reais de trabalhos que já fizemos, para mostrar aos clientes o "
     "nível de qualidade e o tipo de conteúdo que criamos para cada setor."
 )
 st.markdown("")
@@ -50,4 +50,4 @@ for i, (icone, negocio) in enumerate(NEGOCIOS_MOCKUP):
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-st.info("💡 Estes exemplos aparecem aqui independentemente do cliente selecionado — servem para mostrar o teu portefólio geral.")
+st.info("💡 Estes exemplos aparecem aqui independentemente do cliente selecionado. Servem para mostrar o teu portefólio geral.")

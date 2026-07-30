@@ -14,7 +14,7 @@ st.markdown(
         </h1>
         <p style="font-size:1.05rem;color:#4b5a51;max-width:640px;">
             Gestão profissional de Instagram e Facebook, criação de conteúdo e planeamento
-            que dá resultados — sem teres de gastar tempo nenhum com isso.
+            que dá resultados, sem teres de gastar tempo nenhum com isso.
         </p>
     </div>
     """,
@@ -38,7 +38,7 @@ st.markdown("## Quem somos")
 st.markdown(
     f"""
     <div class="card">
-        <p>Ajudamos negócios locais — farmácias, restaurantes, ginásios e clínicas — a
+        <p>Ajudamos negócios locais (farmácias, restaurantes, ginásios e clínicas) a
         fortalecer a sua presença digital através da gestão de redes sociais, criação de
         conteúdo e planeamento estratégico feito à medida de cada negócio.</p>
         <p>Nada de conteúdo genérico: cada plano é pensado para o setor e o público do
@@ -134,10 +134,10 @@ st.markdown(
                 Economics e um bootcamp de Data Analytics pelo Le Wagon, onde trabalho com
                 análise de dados, estratégia e ferramentas de visualização como Power BI e
                 Looker Studio. Antes disso, geri as operações de um clube de padel, onde ajudei
-                a multiplicar a faturação mensal — uma experiência que me mostrou o impacto real
+                a multiplicar a faturação mensal, uma experiência que me mostrou o impacto real
                 que uma boa gestão e comunicação têm num negócio local.</p>
-                <p>Junto essa visão analítica e orientada a resultados à criação de conteúdo —
-                também crio conteúdo próprio no YouTube sobre finanças e mentalidade — para
+                <p>Junto essa visão analítica e orientada a resultados à criação de conteúdo.
+                Também crio conteúdo próprio no YouTube sobre finanças e mentalidade, para
                 ajudar negócios como o teu a crescerem nas redes sociais de forma consistente
                 e mensurável.</p>
             </div>
@@ -154,7 +154,7 @@ st.markdown("## Testemunhos")
 st.markdown(
     """
     <div class="card">
-        <p style="color:#6b7a70;">Ainda estamos a começar — os primeiros testemunhos de
+        <p style="color:#6b7a70;">Ainda estamos a começar. Os primeiros testemunhos de
         clientes vão aparecer aqui assim que tivermos os primeiros resultados documentados.</p>
     </div>
     """,
@@ -202,4 +202,4 @@ for c, (titulo, desc) in zip([c1, c2, c3, c4, c5], resumo):
         )
 
 st.markdown("---")
-st.caption(f"Demo criada para apresentar o serviço {NOME_NEGOCIO} — dados fictícios para fins de demonstração.")
+st.caption(f"Demo criada para apresentar o serviço {NOME_NEGOCIO}. Dados fictícios para fins de demonstração.")

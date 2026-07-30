@@ -69,10 +69,10 @@ st.markdown("### Extras (fora dos pacotes)")
 st.markdown(
     """
     <div class="card">
-    <p>🎯 Segmentação de clientes adicional — <b>20€</b> cada</p>
-    <p>📸 Sessão fotográfica — <b>paga à parte</b> (orçamento sob consulta)</p>
-    <p>📢 Gestão de campanhas de anúncios pagos — <b>15%–20%</b> do orçamento investido em ads, mínimo 100€/mês</p>
-    <p>🎬 Produção de vídeo adicional — <b>25€–40€/vídeo</b></p>
+    <p>🎯 Segmentação de clientes adicional: <b>20€</b> cada</p>
+    <p>📸 Sessão fotográfica: <b>paga à parte</b> (orçamento sob consulta)</p>
+    <p>📢 Gestão de campanhas de anúncios pagos: <b>15%–20%</b> do orçamento investido em ads, mínimo 100€/mês</p>
+    <p>🎬 Produção de vídeo adicional: <b>25€–40€/vídeo</b></p>
     </div>
     """,
     unsafe_allow_html=True,
@@ -94,7 +94,7 @@ st.markdown("### Condições gerais")
 st.markdown(
     """
     <div class="card">
-    <p>📌 Sem fidelização — cancelamento com 15 dias de aviso</p>
+    <p>📌 Sem fidelização, cancelamento com 15 dias de aviso</p>
     <p>📌 Conteúdo aprovado antes de publicar (grupo/app dedicado)</p>
     <p>📌 Fotos fornecidas pelo cliente ou tiradas por nós (sessão fotográfica à parte)</p>
     <p>📌 Pagamento mensal, até ao dia 5</p>
