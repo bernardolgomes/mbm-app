@@ -180,14 +180,49 @@ def gerar_insights(cliente: str, historico: dict) -> str:
                         "para negócios locais. Analisa os dados mensais abaixo de um cliente e escreve "
                         "uma leitura curta (máximo 120 palavras) em português de Portugal, destacando "
                         "tendências, o que correu bem e uma sugestão concreta de melhoria para o próximo mês.\n\n"
+                        "Escreve em texto corrido, dividido em 3 parágrafos curtos com uma linha em branco "
+                        "entre eles, cada um a começar por um rótulo simples seguido de dois pontos: "
+                        "'Tendências:', 'Pontos positivos:' e 'Sugestão de melhoria:'. "
+                        "NÃO uses markdown (nada de #, **, -, *, listas ou títulos), só texto simples.\n\n"
                         + resumo_dados
                     ),
                 }
             ],
         )
-        return resposta.content[0].text.strip()
+        return _limpar_markdown(resposta.content[0].text.strip())
     except Exception as e:
         return f"(Não foi possível gerar a análise com IA, mostrando leitura automática. Detalhe: {e})\n\n" + _insight_basico(atual, anterior)
+
+
+def _limpar_markdown(texto: str) -> str:
+    """Remove símbolos de markdown que a IA às vezes usa (#, **, -, *), para o texto
+    poder ser mostrado tal e qual, tanto no cartão HTML como no PDF."""
+    texto = re.sub(r"^#{1,6}\s*", "", texto, flags=re.MULTILINE)
+    texto = texto.replace("**", "").replace("__", "")
+    texto = re.sub(r"^[\-\*•]\s+", "", texto, flags=re.MULTILINE)
+    return texto.strip()
+
+
+def insight_para_html(texto: str) -> str:
+    """Converte o texto de insights (com rótulos tipo 'Tendências:') em HTML simples,
+    com o rótulo a bold, para mostrar dentro de um cartão da app."""
+    import html as html_lib
+
+    paragrafos = [p.strip() for p in texto.split("\n\n") if p.strip()]
+    partes_html = []
+    for p in paragrafos:
+        linhas = p.split("\n")
+        primeira = linhas[0]
+        m = re.match(r"^([^:]{2,40}:)\s*(.*)$", primeira)
+        if m:
+            rotulo, resto = m.groups()
+            resto_completo = " ".join([resto] + linhas[1:]).strip()
+            partes_html.append(
+                f"<p><b>{html_lib.escape(rotulo)}</b> {html_lib.escape(resto_completo)}</p>"
+            )
+        else:
+            partes_html.append(f"<p>{html_lib.escape(p).replace(chr(10), '<br>')}</p>")
+    return "".join(partes_html)
 
 
 def gerar_pdf_relatorio(cliente: str, dados_cliente: dict, historico: dict, insight_texto: str, mes_calendario: dict | None = None) -> bytes:
@@ -222,63 +257,120 @@ def gerar_pdf_relatorio(cliente: str, dados_cliente: dict, historico: dict, insi
     plt.close(fig)
     buf.seek(0)
 
+    VERDE = (30, 138, 95)
+    TURQUESA = (15, 120, 105)
+    TEXTO_ESCURO = (38, 45, 40)
+    CINZA = (110, 110, 110)
+    FUNDO_CARTAO = (247, 242, 231)
+
+    def _l1(txt: str) -> str:
+        """Garante que o texto é seguro para o PDF (latin-1), sem perder acentos comuns."""
+        return txt.encode("latin-1", "replace").decode("latin-1")
+
+    def _titulo_secao(texto: str):
+        pdf.ln(2)
+        pdf.set_text_color(*TURQUESA)
+        pdf.set_font("Helvetica", "B", 13)
+        pdf.cell(0, 9, _l1(texto), ln=True)
+        pdf.set_draw_color(*TURQUESA)
+        pdf.set_line_width(0.6)
+        y = pdf.get_y()
+        pdf.line(pdf.l_margin, y, pdf.l_margin + 40, y)
+        pdf.ln(3)
+        pdf.set_text_color(*TEXTO_ESCURO)
+
+    def _cartao(altura: float):
+        x, y = pdf.l_margin, pdf.get_y()
+        largura = pdf.w - pdf.l_margin - pdf.r_margin
+        pdf.set_fill_color(*FUNDO_CARTAO)
+        pdf.rect(x, y, largura, altura, style="F")
+        pdf.set_xy(x + 4, y + 3)
+
     pdf = FPDF()
     pdf.add_page()
 
-    pdf.set_font("Helvetica", "B", 18)
-    pdf.set_text_color(30, 138, 95)
-    pdf.cell(0, 12, f"Relatorio mensal - {cliente}", ln=True)
+    # Cabeçalho com barra de cor de marca.
+    pdf.set_fill_color(*VERDE)
+    pdf.rect(0, 0, pdf.w, 30, style="F")
+    pdf.set_xy(pdf.l_margin, 8)
+    pdf.set_text_color(255, 255, 255)
+    pdf.set_font("Helvetica", "B", 20)
+    pdf.cell(0, 10, "MBM  |  Relatorio mensal", ln=True)
+    pdf.set_xy(pdf.l_margin, 19)
+    pdf.set_font("Helvetica", "", 12)
+    pdf.cell(0, 8, _l1(f"{cliente}  -  {ultimo}"), ln=True)
 
-    pdf.set_font("Helvetica", "", 11)
-    pdf.set_text_color(90, 90, 90)
+    pdf.set_xy(pdf.l_margin, 36)
+    pdf.set_text_color(*CINZA)
+    pdf.set_font("Helvetica", "", 10)
     pdf.cell(
-        0, 8,
-        f"Plano: {dados_cliente.get('plano', '-')}   |   Nicho: {dados_cliente.get('nicho', '-')}   |   "
-        f"Cliente desde: {dados_cliente.get('desde', '-')}   |   Mes de referencia: {ultimo}",
+        0, 7,
+        _l1(
+            f"Plano: {dados_cliente.get('plano', '-')}   |   Nicho: {dados_cliente.get('nicho', '-')}   |   "
+            f"Cliente desde: {dados_cliente.get('desde', '-')}"
+        ),
         ln=True,
     )
-    pdf.ln(4)
+    pdf.ln(2)
 
-    pdf.set_text_color(20, 20, 20)
-    pdf.set_font("Helvetica", "B", 13)
-    pdf.cell(0, 8, "Indicadores do mes", ln=True)
+    # Indicadores do mês, dentro de um cartão com fundo creme.
+    _titulo_secao("Indicadores do mes")
+    altura_cartao = 7 * len(INDICADORES) + 6
+    _cartao(altura_cartao)
     pdf.set_font("Helvetica", "", 10)
+    pdf.set_text_color(*TEXTO_ESCURO)
     for chave, label, fmt in INDICADORES:
         v_atual = dados_ultimo.get(chave)
         v_ant = dados_anterior.get(chave) if dados_anterior else None
         linha = f"{label}: {fmt.format(v_atual) if v_atual is not None else '-'}"
         if v_atual is not None and v_ant not in (None, 0):
             variacao = (v_atual - v_ant) / v_ant * 100
-            linha += f"  ({'+' if variacao >= 0 else ''}{variacao:.1f}% vs mes anterior)"
-        pdf.cell(0, 7, linha.encode("latin-1", "replace").decode("latin-1"), ln=True)
-    pdf.ln(4)
+            linha += f"   ({'+' if variacao >= 0 else ''}{variacao:.1f}% vs mes anterior)"
+        pdf.set_x(pdf.l_margin + 4)
+        pdf.cell(0, 7, _l1(linha), ln=True)
+    pdf.ln(6)
 
-    pdf.set_font("Helvetica", "B", 13)
-    pdf.cell(0, 8, "Evolucao de seguidores", ln=True)
+    # Gráfico de evolução.
+    _titulo_secao("Evolucao de seguidores")
     pdf.image(buf, w=170)
     pdf.ln(4)
 
+    # Publicações do mês (a partir do calendário).
     if mes_calendario:
         contagem: dict[str, int] = {}
         for tipo in mes_calendario.values():
             if tipo and tipo != "—":
-                tipo_limpo = tipo.encode("latin-1", "replace").decode("latin-1")
-                contagem[tipo_limpo] = contagem.get(tipo_limpo, 0) + 1
-        pdf.set_font("Helvetica", "B", 13)
-        pdf.cell(0, 8, "Publicacoes do mes", ln=True)
+                contagem[_l1(tipo)] = contagem.get(_l1(tipo), 0) + 1
+        _titulo_secao("Publicacoes do mes")
         pdf.set_font("Helvetica", "", 10)
         if contagem:
             for tipo, n in contagem.items():
                 pdf.cell(0, 7, f"{tipo}: {n}", ln=True)
         else:
             pdf.cell(0, 7, "Sem publicacoes registadas no calendario este mes.", ln=True)
-        pdf.ln(4)
+        pdf.ln(2)
 
-    pdf.set_font("Helvetica", "B", 13)
-    pdf.cell(0, 8, "Analise e insights", ln=True)
-    pdf.set_font("Helvetica", "", 10)
-    texto_seguro = insight_texto.encode("latin-1", "replace").decode("latin-1")
-    pdf.multi_cell(0, 6, texto_seguro)
+    # Análise e insights, com rótulos a bold.
+    _titulo_secao("Analise e insights")
+    texto_seguro = _l1(insight_texto)
+    paragrafos = [p.strip() for p in texto_seguro.split("\n\n") if p.strip()]
+    if not paragrafos:
+        paragrafos = [texto_seguro]
+    for p in paragrafos:
+        linhas = p.split("\n")
+        primeira = linhas[0]
+        m = re.match(r"^([^:]{2,40}:)\s*(.*)$", primeira)
+        if m:
+            rotulo, resto = m.groups()
+            resto_completo = " ".join([resto] + linhas[1:]).strip()
+            pdf.set_font("Helvetica", "B", 10)
+            pdf.write(6, rotulo + " ")
+            pdf.set_font("Helvetica", "", 10)
+            pdf.multi_cell(0, 6, resto_completo)
+        else:
+            pdf.set_font("Helvetica", "", 10)
+            pdf.multi_cell(0, 6, p)
+        pdf.ln(2)
 
     return bytes(pdf.output())
 

@@ -10,6 +10,7 @@ from utils import (
     carregar_calendario,
     gerar_insights,
     gerar_pdf_relatorio,
+    insight_para_html,
     INDICADORES,
     INDICADORES_INTEIROS,
 )
@@ -168,7 +169,7 @@ if e_admin():
 
 texto_insight = st.session_state.get(chave_cache)
 if texto_insight:
-    st.markdown(f'<div class="card">{texto_insight}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="card">{insight_para_html(texto_insight)}</div>', unsafe_allow_html=True)
 else:
     st.caption(
         "Ainda sem análise gerada para este mês."
