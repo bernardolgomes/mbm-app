@@ -42,7 +42,7 @@ st.markdown("## Quem somos")
 st.markdown(
     f"""
     <div class="card">
-        <p>Ajudamos negócios locais (farmácias, restaurantes, ginásios e clínicas) a
+        <p>Ajudamos negócios locais (farmácias, restaurantes, ginásios, clínicas e alojamentos locais) a
         fortalecer a sua presença digital através da gestão de redes sociais, criação de
         conteúdo e planeamento estratégico feito à medida de cada negócio.</p>
         <p>Nada de conteúdo genérico: cada plano é pensado para o setor e o público do
@@ -204,4 +204,3 @@ for c, (titulo, desc) in zip([c1, c2, c3, c4, c5], resumo):
             """,
             unsafe_allow_html=True,
         )
-

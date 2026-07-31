@@ -30,12 +30,12 @@ EXEMPLOS = {
 }
 lista = EXEMPLOS.get(dados["nicho"], EXEMPLOS["Farmácia"])
 
-cols = st.columns(3)
+cols = st.columns(2)
 
 for i, (titulo, legenda) in enumerate(lista):
     fotos = listar_fotos(cliente, titulo)
 
-    with cols[i % 3]:
+    with cols[i % 2]:
         st.markdown(
             f"""
             <div class="card">
@@ -46,9 +46,10 @@ for i, (titulo, legenda) in enumerate(lista):
         )
 
         if fotos:
-            sub_cols = st.columns(2)
+            n_sub = min(2, len(fotos))
+            sub_cols = st.columns(n_sub)
             for j, caminho in enumerate(fotos):
-                with sub_cols[j % 2]:
+                with sub_cols[j % n_sub]:
                     st.image(str(caminho), use_container_width=True)
                     if editavel and st.button("🗑️", key=f"remover-{titulo}-{caminho.name}", help="Remover"):
                         apagar_foto(caminho)
