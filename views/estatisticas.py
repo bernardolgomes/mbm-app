@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 from datetime import date
 
 from utils import (
@@ -10,6 +11,7 @@ from utils import (
     gerar_insights,
     gerar_pdf_relatorio,
     INDICADORES,
+    INDICADORES_INTEIROS,
 )
 
 cliente, dados, accent = setup_page("Estatísticas")
@@ -21,9 +23,10 @@ MESES_PT = [
 
 st.markdown("# Estatísticas")
 st.write(
-    f"Análise própria e independente dos resultados de **{cliente}**. O Instagram e o "
-    "Facebook também recolhem os seus dados, mas mantemos a nossa própria leitura para "
-    "dar total transparência sobre a evolução do trabalho."
+    f"Aqui podes acompanhar a evolução da tua performance nas redes sociais de forma "
+    f"clara e direta, mês após mês. Todos os nossos relatórios são construídos com base "
+    f"nesta leitura própria dos resultados de **{cliente}**, independente da análise que "
+    "o Instagram e o Facebook fazem internamente."
 )
 st.markdown("")
 
@@ -53,9 +56,16 @@ if e_admin():
             cols_input = st.columns(len(INDICADORES))
             for c, (chave, label, _) in zip(cols_input, INDICADORES):
                 with c:
-                    valores[chave] = st.number_input(
-                        label, value=float(existente.get(chave, 0)), key=f"input-{chave}"
-                    )
+                    if chave in INDICADORES_INTEIROS:
+                        valores[chave] = st.number_input(
+                            label, value=int(existente.get(chave, 0)), step=1, format="%d",
+                            key=f"input-{chave}",
+                        )
+                    else:
+                        valores[chave] = st.number_input(
+                            label, value=float(existente.get(chave, 0)), step=0.1, format="%.1f",
+                            key=f"input-{chave}",
+                        )
             guardar = st.form_submit_button("💾 Guardar dados deste mês")
             if guardar:
                 historico[chave_mes] = valores
@@ -101,14 +111,49 @@ else:
     st.caption("Assim que houver dois ou mais meses registados, aparece aqui o gráfico de evolução.")
 
 st.markdown("### Histórico completo")
-tabela = []
+linhas = []
 for m in meses_ordenados:
     linha = {"Mês": m}
-    for chave, label, fmt in INDICADORES:
-        v = historico[m].get(chave)
-        linha[label] = fmt.format(v) if v is not None else "-"
-    tabela.append(linha)
-st.dataframe(tabela, use_container_width=True, hide_index=True)
+    for chave, label, _ in INDICADORES:
+        linha[label] = historico[m].get(chave, 0)
+    linhas.append(linha)
+df_historico = pd.DataFrame(linhas)
+
+configuracao_colunas = {"Mês": st.column_config.TextColumn("Mês", disabled=True)}
+for chave, label, _ in INDICADORES:
+    formato = "%.1f" if chave == "engagement" else "%d"
+    configuracao_colunas[label] = st.column_config.NumberColumn(label, format=formato)
+
+if e_admin():
+    st.caption(
+        "Podes corrigir os valores diretamente na tabela. Para remover um mês, seleciona "
+        "a linha (à esquerda) e clica no ícone de lixo que aparece por cima da tabela."
+    )
+    df_editado = st.data_editor(
+        df_historico,
+        use_container_width=True,
+        hide_index=True,
+        num_rows="dynamic",
+        column_config=configuracao_colunas,
+        key="editor_estatisticas",
+    )
+    if st.button("💾 Guardar alterações à tabela"):
+        novo_historico = {}
+        for _, linha in df_editado.iterrows():
+            mes = linha["Mês"]
+            if not mes or (isinstance(mes, float) and pd.isna(mes)):
+                continue
+            novo_historico[mes] = {
+                chave: (float(linha[label]) if not pd.isna(linha[label]) else 0.0)
+                for chave, label, _ in INDICADORES
+            }
+        guardar_estatisticas(cliente, novo_historico)
+        st.toast("Tabela atualizada ✅")
+        st.rerun()
+else:
+    st.dataframe(
+        df_historico, use_container_width=True, hide_index=True, column_config=configuracao_colunas
+    )
 
 # ---------------------------------------------------------------------------
 # ANÁLISE / INSIGHTS

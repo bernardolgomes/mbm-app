@@ -85,12 +85,16 @@ def apagar_foto(caminho: Path):
 # Introduzida manualmente (admin), não depende de nenhuma API externa.
 # ---------------------------------------------------------------------------
 INDICADORES = [
-    ("seguidores", "Seguidores", "{:,.0f}"),
+    ("seguidores", "Total de seguidores", "{:,.0f}"),
     ("alcance", "Alcance mensal", "{:,.0f}"),
     ("engagement", "Taxa de engagement (%)", "{:.1f}%"),
     ("novos_seguidores", "Novos seguidores", "{:,.0f}"),
     ("cliques_link", "Cliques no link da bio", "{:,.0f}"),
 ]
+
+# Indicadores que são sempre número inteiro (sem casas decimais nem percentagem
+# nos campos de introdução/edição). Só a taxa de engagement fica com 1 casa decimal.
+INDICADORES_INTEIROS = {"seguidores", "alcance", "novos_seguidores", "cliques_link"}
 
 
 def carregar_estatisticas(cliente: str) -> dict:
@@ -135,7 +139,7 @@ def _insight_basico(atual: dict, anterior: dict | None) -> str:
         partes.append(f"{label} {tendencia}")
     if not partes:
         return "Ainda não há dados suficientes para comparar com o mês anterior."
-    return "Leitura automática (sem IA): " + "; ".join(partes) + "."
+    return "; ".join(partes) + "."
 
 
 def gerar_insights(cliente: str, historico: dict) -> str:
