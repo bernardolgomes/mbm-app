@@ -3,6 +3,7 @@ Funções e dados partilhados entre todas as páginas da demo.
 """
 
 import json
+import os
 import re
 from datetime import date
 from pathlib import Path
@@ -77,6 +78,205 @@ def guardar_foto(cliente: str, categoria: str, nome_ficheiro: str, conteudo: byt
 def apagar_foto(caminho: Path):
     if caminho.exists():
         caminho.unlink()
+
+
+# ---------------------------------------------------------------------------
+# ESTATÍSTICAS: análise própria e independente, guardada mês a mês por cliente.
+# Introduzida manualmente (admin), não depende de nenhuma API externa.
+# ---------------------------------------------------------------------------
+INDICADORES = [
+    ("seguidores", "Seguidores", "{:,.0f}"),
+    ("alcance", "Alcance mensal", "{:,.0f}"),
+    ("engagement", "Taxa de engagement (%)", "{:.1f}%"),
+    ("novos_seguidores", "Novos seguidores", "{:,.0f}"),
+    ("cliques_link", "Cliques no link da bio", "{:,.0f}"),
+]
+
+
+def carregar_estatisticas(cliente: str) -> dict:
+    """Devolve {"AAAA-MM": {indicador: valor, ...}, ...} guardado para este cliente."""
+    ficheiro = cliente_dir(cliente) / "estatisticas.json"
+    if ficheiro.exists():
+        return json.loads(ficheiro.read_text(encoding="utf-8"))
+    return {}
+
+
+def guardar_estatisticas(cliente: str, historico: dict):
+    ficheiro = cliente_dir(cliente) / "estatisticas.json"
+    ficheiro.write_text(json.dumps(historico, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def e_admin() -> bool:
+    """True só quando a sessão iniciada é de administração (não é acesso de cliente).
+    Usar para ações reservadas à administração, como exportar relatórios em PDF."""
+    return bool(st.session_state.get("autenticado")) and not st.session_state.get("cliente_bloqueado")
+
+
+def _insight_basico(atual: dict, anterior: dict | None) -> str:
+    """Leitura automática simples, sem IA, baseada na variação face ao mês anterior."""
+    if not anterior:
+        return (
+            "Este é o primeiro mês com dados registados para este cliente. A partir do "
+            "próximo mês vais poder ver a evolução face a este ponto de partida."
+        )
+    partes = []
+    for chave, label, _ in INDICADORES:
+        v_atual = atual.get(chave)
+        v_ant = anterior.get(chave)
+        if v_atual is None or v_ant is None or v_ant == 0:
+            continue
+        variacao = (v_atual - v_ant) / v_ant * 100
+        if variacao > 0.5:
+            tendencia = f"subiu {variacao:.1f}%"
+        elif variacao < -0.5:
+            tendencia = f"desceu {abs(variacao):.1f}%"
+        else:
+            tendencia = "manteve-se estável"
+        partes.append(f"{label} {tendencia}")
+    if not partes:
+        return "Ainda não há dados suficientes para comparar com o mês anterior."
+    return "Leitura automática (sem IA): " + "; ".join(partes) + "."
+
+
+def gerar_insights(cliente: str, historico: dict) -> str:
+    """Gera uma leitura dos resultados do cliente. Usa a API da Anthropic se houver
+    uma chave configurada (st.secrets['ANTHROPIC_API_KEY'] ou variável de ambiente
+    ANTHROPIC_API_KEY); caso contrário, devolve uma leitura automática simples,
+    baseada apenas nas variações percentuais entre meses."""
+    meses = sorted(historico.keys())
+    if not meses:
+        return "Ainda não há dados suficientes para gerar uma análise."
+
+    atual = historico[meses[-1]]
+    anterior = historico[meses[-2]] if len(meses) >= 2 else None
+
+    chave_api = os.environ.get("ANTHROPIC_API_KEY")
+    if not chave_api:
+        try:
+            chave_api = st.secrets.get("ANTHROPIC_API_KEY")
+        except Exception:
+            chave_api = None
+
+    if not chave_api:
+        return _insight_basico(atual, anterior)
+
+    try:
+        import anthropic
+
+        client = anthropic.Anthropic(api_key=chave_api)
+        resumo_dados = f"Cliente: {cliente}\nDados mensais (mês -> indicadores): {json.dumps(historico, ensure_ascii=False)}"
+        resposta = client.messages.create(
+            model="claude-sonnet-4-5",
+            max_tokens=400,
+            messages=[
+                {
+                    "role": "user",
+                    "content": (
+                        "És um analista de redes sociais de uma agência de gestão de redes sociais "
+                        "para negócios locais. Analisa os dados mensais abaixo de um cliente e escreve "
+                        "uma leitura curta (máximo 120 palavras) em português de Portugal, destacando "
+                        "tendências, o que correu bem e uma sugestão concreta de melhoria para o próximo mês.\n\n"
+                        + resumo_dados
+                    ),
+                }
+            ],
+        )
+        return resposta.content[0].text.strip()
+    except Exception as e:
+        return f"(Não foi possível gerar a análise com IA, mostrando leitura automática. Detalhe: {e})\n\n" + _insight_basico(atual, anterior)
+
+
+def gerar_pdf_relatorio(cliente: str, dados_cliente: dict, historico: dict, insight_texto: str, mes_calendario: dict | None = None) -> bytes:
+    """Gera o PDF do relatório mensal deste cliente: indicadores, gráfico de evolução,
+    publicações do mês (via calendário) e a análise/insights. Só deve ser chamado a
+    partir de uma sessão de administração (ver e_admin())."""
+    import io
+
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from fpdf import FPDF
+
+    meses = sorted(historico.keys())
+    ultimo = meses[-1]
+    anterior = meses[-2] if len(meses) >= 2 else None
+    dados_ultimo = historico[ultimo]
+    dados_anterior = historico[anterior] if anterior else None
+
+    # Gráfico de evolução de seguidores ao longo dos meses.
+    fig, ax = plt.subplots(figsize=(6.4, 3))
+    seguidores = [historico[m].get("seguidores", 0) for m in meses]
+    ax.plot(meses, seguidores, marker="o", color="#1E8A5F")
+    ax.set_ylabel("Seguidores")
+    ax.set_xlabel("Mês")
+    ax.grid(alpha=0.3)
+    plt.xticks(rotation=45, ha="right")
+    plt.tight_layout()
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png", dpi=150)
+    plt.close(fig)
+    buf.seek(0)
+
+    pdf = FPDF()
+    pdf.add_page()
+
+    pdf.set_font("Helvetica", "B", 18)
+    pdf.set_text_color(30, 138, 95)
+    pdf.cell(0, 12, f"Relatorio mensal - {cliente}", ln=True)
+
+    pdf.set_font("Helvetica", "", 11)
+    pdf.set_text_color(90, 90, 90)
+    pdf.cell(
+        0, 8,
+        f"Plano: {dados_cliente.get('plano', '-')}   |   Nicho: {dados_cliente.get('nicho', '-')}   |   "
+        f"Cliente desde: {dados_cliente.get('desde', '-')}   |   Mes de referencia: {ultimo}",
+        ln=True,
+    )
+    pdf.ln(4)
+
+    pdf.set_text_color(20, 20, 20)
+    pdf.set_font("Helvetica", "B", 13)
+    pdf.cell(0, 8, "Indicadores do mes", ln=True)
+    pdf.set_font("Helvetica", "", 10)
+    for chave, label, fmt in INDICADORES:
+        v_atual = dados_ultimo.get(chave)
+        v_ant = dados_anterior.get(chave) if dados_anterior else None
+        linha = f"{label}: {fmt.format(v_atual) if v_atual is not None else '-'}"
+        if v_atual is not None and v_ant not in (None, 0):
+            variacao = (v_atual - v_ant) / v_ant * 100
+            linha += f"  ({'+' if variacao >= 0 else ''}{variacao:.1f}% vs mes anterior)"
+        pdf.cell(0, 7, linha.encode("latin-1", "replace").decode("latin-1"), ln=True)
+    pdf.ln(4)
+
+    pdf.set_font("Helvetica", "B", 13)
+    pdf.cell(0, 8, "Evolucao de seguidores", ln=True)
+    pdf.image(buf, w=170)
+    pdf.ln(4)
+
+    if mes_calendario:
+        contagem: dict[str, int] = {}
+        for tipo in mes_calendario.values():
+            if tipo and tipo != "—":
+                tipo_limpo = tipo.encode("latin-1", "replace").decode("latin-1")
+                contagem[tipo_limpo] = contagem.get(tipo_limpo, 0) + 1
+        pdf.set_font("Helvetica", "B", 13)
+        pdf.cell(0, 8, "Publicacoes do mes", ln=True)
+        pdf.set_font("Helvetica", "", 10)
+        if contagem:
+            for tipo, n in contagem.items():
+                pdf.cell(0, 7, f"{tipo}: {n}", ln=True)
+        else:
+            pdf.cell(0, 7, "Sem publicacoes registadas no calendario este mes.", ln=True)
+        pdf.ln(4)
+
+    pdf.set_font("Helvetica", "B", 13)
+    pdf.cell(0, 8, "Analise e insights", ln=True)
+    pdf.set_font("Helvetica", "", 10)
+    texto_seguro = insight_texto.encode("latin-1", "replace").decode("latin-1")
+    pdf.multi_cell(0, 6, texto_seguro)
+
+    return bytes(pdf.output())
 
 
 # ---------------------------------------------------------------------------
