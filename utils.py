@@ -109,10 +109,10 @@ CLIENTES_BASE = {
     "GRCarvoeiro": {
         "cor": "#0E9488",
         "nicho": "Farmácia",
-        "plano": "Plano Business",
+        "plano": "Business",
         "desde": "Jul 2026",
-        "posts_mes": 8,
-        "stories_mes": 8,
+        "posts_mes": 4,
+        "stories_mes": 4,
         "real": True,
         "senha": "carvoeiro2026",
     },
@@ -121,9 +121,9 @@ CLIENTES_BASE = {
 NICHOS = ["Farmácia", "Restauração", "Ginásio", "Personal Trainer", "Clínica", "Outro"]
 
 PLANOS = {
-    "Plano Start": {"posts_mes": 2, "stories_mes": 2},
-    "Plano Business": {"posts_mes": 8, "stories_mes": 8},
-    "Plano Premium": {"posts_mes": 8, "stories_mes": 8},
+    "Starter / Basic": {"posts_mes": 2, "stories_mes": 2},
+    "Business": {"posts_mes": 4, "stories_mes": 4},
+    "Premium": {"posts_mes": 6, "stories_mes": 6},
 }
 
 # (hex, emoji de amostra, nome em português) — mostrado no seletor de cor do cliente
