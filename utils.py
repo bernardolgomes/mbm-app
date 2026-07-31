@@ -87,14 +87,20 @@ def apagar_foto(caminho: Path):
 INDICADORES = [
     ("seguidores", "Total de seguidores", "{:,.0f}"),
     ("alcance", "Alcance mensal", "{:,.0f}"),
+    ("impressoes", "Impressões", "{:,.0f}"),
     ("engagement", "Taxa de engagement (%)", "{:.1f}%"),
     ("novos_seguidores", "Novos seguidores", "{:,.0f}"),
+    ("visitas_perfil", "Visitas ao perfil", "{:,.0f}"),
     ("cliques_link", "Cliques no link da bio", "{:,.0f}"),
+    ("mensagens", "Mensagens/contactos recebidos", "{:,.0f}"),
 ]
 
 # Indicadores que são sempre número inteiro (sem casas decimais nem percentagem
 # nos campos de introdução/edição). Só a taxa de engagement fica com 1 casa decimal.
-INDICADORES_INTEIROS = {"seguidores", "alcance", "novos_seguidores", "cliques_link"}
+INDICADORES_INTEIROS = {
+    "seguidores", "alcance", "impressoes", "novos_seguidores",
+    "visitas_perfil", "cliques_link", "mensagens",
+}
 
 
 def carregar_estatisticas(cliente: str) -> dict:

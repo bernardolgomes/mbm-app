@@ -54,19 +54,20 @@ if e_admin():
 
         with st.form("form_estatisticas"):
             valores = {}
-            cols_input = st.columns(len(INDICADORES))
-            for c, (chave, label, _) in zip(cols_input, INDICADORES):
-                with c:
-                    if chave in INDICADORES_INTEIROS:
-                        valores[chave] = st.number_input(
-                            label, value=int(existente.get(chave, 0)), step=1, format="%d",
-                            key=f"input-{chave}",
-                        )
-                    else:
-                        valores[chave] = st.number_input(
-                            label, value=float(existente.get(chave, 0)), step=0.1, format="%.1f",
-                            key=f"input-{chave}",
-                        )
+            for linha_indicadores in (INDICADORES[:4], INDICADORES[4:]):
+                cols_input = st.columns(4)
+                for c, (chave, label, _) in zip(cols_input, linha_indicadores):
+                    with c:
+                        if chave in INDICADORES_INTEIROS:
+                            valores[chave] = st.number_input(
+                                label, value=int(existente.get(chave, 0)), step=1, format="%d",
+                                key=f"input-{chave}",
+                            )
+                        else:
+                            valores[chave] = st.number_input(
+                                label, value=float(existente.get(chave, 0)), step=0.1, format="%.1f",
+                                key=f"input-{chave}",
+                            )
             guardar = st.form_submit_button("💾 Guardar dados deste mês")
             if guardar:
                 historico[chave_mes] = valores
@@ -92,14 +93,15 @@ dados_anterior = historico[anterior] if anterior else None
 # MÉTRICAS DO ÚLTIMO MÊS (com variação face ao mês anterior)
 # ---------------------------------------------------------------------------
 st.markdown(f"### Resultados de {ultimo}")
-cols = st.columns(len(INDICADORES))
-for c, (chave, label, fmt) in zip(cols, INDICADORES):
-    valor = dados_ultimo.get(chave)
-    delta = None
-    if dados_anterior and dados_anterior.get(chave) not in (None, 0) and valor is not None:
-        delta = f"{(valor - dados_anterior[chave]) / dados_anterior[chave] * 100:+.1f}%"
-    with c:
-        st.metric(label, fmt.format(valor) if valor is not None else "-", delta)
+for linha_indicadores in (INDICADORES[:4], INDICADORES[4:]):
+    cols = st.columns(4)
+    for c, (chave, label, fmt) in zip(cols, linha_indicadores):
+        valor = dados_ultimo.get(chave)
+        delta = None
+        if dados_anterior and dados_anterior.get(chave) not in (None, 0) and valor is not None:
+            delta = f"{(valor - dados_anterior[chave]) / dados_anterior[chave] * 100:+.1f}%"
+        with c:
+            st.metric(label, fmt.format(valor) if valor is not None else "-", delta)
 
 st.markdown("")
 st.markdown("### Evolução mensal")
@@ -110,6 +112,34 @@ if len(meses_ordenados) >= 2:
     st.line_chart(valores_serie)
 else:
     st.caption("Assim que houver dois ou mais meses registados, aparece aqui o gráfico de evolução.")
+
+st.markdown("")
+st.markdown("### Comparação ano a ano")
+anos_disponiveis = sorted({m.split("-")[0] for m in meses_ordenados})
+if len(anos_disponiveis) < 2:
+    st.caption(
+        "Ainda só há dados de um ano registado. Assim que houver histórico de dois anos "
+        "ou mais para o mesmo mês, aparece aqui a comparação automaticamente."
+    )
+else:
+    mes_num_sel = st.selectbox(
+        "Mês a comparar entre anos", list(range(1, 13)),
+        index=int(ultimo.split("-")[1]) - 1,
+        format_func=lambda m: MESES_PT[m - 1], key="yoy_mes",
+    )
+    linhas_ano = []
+    for ano in anos_disponiveis:
+        chave_comp = f"{ano}-{mes_num_sel:02d}"
+        if chave_comp in historico:
+            linha_comp = {"Ano": ano}
+            for chave_ind, label, fmt in INDICADORES:
+                v = historico[chave_comp].get(chave_ind)
+                linha_comp[label] = fmt.format(v) if v is not None else "-"
+            linhas_ano.append(linha_comp)
+    if len(linhas_ano) >= 2:
+        st.dataframe(pd.DataFrame(linhas_ano), use_container_width=True, hide_index=True)
+    else:
+        st.caption(f"Ainda não há dados de {MESES_PT[mes_num_sel - 1]} registados em mais do que um ano.")
 
 st.markdown("### Histórico completo")
 linhas = []
