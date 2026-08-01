@@ -554,18 +554,26 @@ def inject_css(accent: str):
             color: {COR_MARCA};
         }}
         .stButton>button,
+        .stButton>button *,
         div[data-testid="stLinkButton"] a,
+        div[data-testid="stLinkButton"] a *,
         div[data-testid="stDownloadButton"] button,
-        div[data-testid="stFormSubmitButton"] button {{
+        div[data-testid="stDownloadButton"] button *,
+        div[data-testid="stFormSubmitButton"] button,
+        div[data-testid="stFormSubmitButton"] button * {{
             background-color: {COR_MARCA_VERDE} !important;
             color: #ffffff !important;
             border: none !important;
             font-weight: 600 !important;
         }}
         .stButton>button:hover,
+        .stButton>button:hover *,
         div[data-testid="stLinkButton"] a:hover,
+        div[data-testid="stLinkButton"] a:hover *,
         div[data-testid="stDownloadButton"] button:hover,
-        div[data-testid="stFormSubmitButton"] button:hover {{
+        div[data-testid="stDownloadButton"] button:hover *,
+        div[data-testid="stFormSubmitButton"] button:hover,
+        div[data-testid="stFormSubmitButton"] button:hover * {{
             background-color: {COR_MARCA} !important;
             color: #ffffff !important;
         }}
@@ -653,7 +661,8 @@ def render_login(contexto: str = "sidebar"):
             div.st-key-{chave_container} [data-testid="stAlertContainer"] * {{
                 color: inherit !important;
             }}
-            div.st-key-{chave_container} .stButton>button {{
+            div.st-key-{chave_container} .stButton>button,
+            div.st-key-{chave_container} .stButton>button * {{
                 background-color: #ffffff !important;
                 color: {COR_MARCA_VERDE} !important;
             }}
