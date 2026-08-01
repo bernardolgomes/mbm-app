@@ -619,28 +619,78 @@ def _tentar_login(senha: str) -> bool:
 
 def render_login(contexto: str = "sidebar"):
     """Mostra o estado de sessão (visitante / com sessão iniciada) e o formulário de
-    login/logout. Pode ser chamado em mais do que um sítio (sidebar e página inicial),
-    o parâmetro 'contexto' só serve para gerar chaves de widget únicas."""
-    if st.session_state.get("autenticado"):
-        quem = st.session_state.get("cliente_bloqueado") or "Administração"
-        st.markdown(f"🔓 Sessão iniciada: **{quem}**")
-        if st.button("🚪 Sair", key=f"sair-{contexto}", use_container_width=True):
-            st.session_state.autenticado = False
-            st.session_state.cliente_bloqueado = None
+    login/logout, dentro de uma caixa verde de marca com texto a branco. Pode ser
+    chamado em mais do que um sítio (sidebar e página inicial), o parâmetro 'contexto'
+    só serve para gerar chaves de widget/CSS únicas."""
+    chave_container = f"login_caixa_{contexto}"
+    chave_aberto = f"mostrar_login_{contexto}"
+    autenticado = bool(st.session_state.get("autenticado"))
+
+    # Antes de haver sessão iniciada e antes de a caixa estar aberta, mostra só um
+    # botão simples para não ocupar espaço com o formulário sempre visível.
+    if not autenticado and not st.session_state.get(chave_aberto):
+        if st.button("🔐 Entrar (clientes e administração)", key=f"abrir-{contexto}", use_container_width=True):
+            st.session_state[chave_aberto] = True
             st.rerun()
-    else:
-        with st.expander("🔐 Entrar (clientes e administração)"):
+        return
+
+    with st.container(key=chave_container):
+        st.markdown(
+            f"""
+            <style>
+            div.st-key-{chave_container} {{
+                background-color: {COR_MARCA_VERDE};
+                border-radius: 10px;
+                padding: 14px 16px 6px 16px;
+            }}
+            div.st-key-{chave_container} * {{
+                color: #ffffff !important;
+            }}
+            div.st-key-{chave_container} input {{
+                color: {COR_TEXTO} !important;
+                background-color: #ffffff !important;
+            }}
+            div.st-key-{chave_container} [data-testid="stAlertContainer"] * {{
+                color: inherit !important;
+            }}
+            div.st-key-{chave_container} .stButton>button {{
+                background-color: #ffffff !important;
+                color: {COR_MARCA_VERDE} !important;
+            }}
+            </style>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        if autenticado:
+            quem = st.session_state.get("cliente_bloqueado") or "Administração"
+            st.markdown(f"🔓 Sessão iniciada: **{quem}**")
+            if st.button("🚪 Sair", key=f"sair-{contexto}", use_container_width=True):
+                st.session_state.autenticado = False
+                st.session_state.cliente_bloqueado = None
+                st.session_state[chave_aberto] = False
+                st.rerun()
+        else:
+            st.markdown("**🔐 Entrar (clientes e administração)**")
             senha = st.text_input(
                 "Palavra-passe",
                 type="password",
                 key=f"login-senha-{contexto}",
                 placeholder="Introduz a tua palavra-passe",
+                label_visibility="collapsed",
             )
-            if st.button("Entrar", key=f"login-btn-{contexto}", use_container_width=True):
-                if _tentar_login(senha):
+            col_entrar, col_cancelar = st.columns(2)
+            with col_entrar:
+                if st.button("Entrar", key=f"login-btn-{contexto}", use_container_width=True):
+                    if _tentar_login(senha):
+                        st.session_state[chave_aberto] = False
+                        st.rerun()
+                    else:
+                        st.error("Palavra-passe incorreta.")
+            with col_cancelar:
+                if st.button("Cancelar", key=f"cancelar-{contexto}", use_container_width=True):
+                    st.session_state[chave_aberto] = False
                     st.rerun()
-                else:
-                    st.error("Palavra-passe incorreta.")
 
 
 def render_marca_sidebar():
