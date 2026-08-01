@@ -10,6 +10,7 @@ st.markdown("")
 fases = [
     (
         "1️⃣ Planeamento de conteúdo",
+
         [
             "Definição dos temas: campanhas e dicas do setor",
             "Calendário mensal de conteúdos",
@@ -19,6 +20,7 @@ fases = [
     ),
     (
         "2️⃣ Criação de conteúdo",
+
         [
             "Design das imagens",
             "Escrita dos textos",
@@ -27,6 +29,7 @@ fases = [
     ),
     (
         "3️⃣ Publicação",
+
         [
             "Agendamento dos posts",
             "Publicação nos melhores horários (12h–14h e 19h30–21h)",
@@ -35,6 +38,7 @@ fases = [
     ),
     (
         "4️⃣ Gestão da comunidade",
+
         [
             "Resposta a comentários",
             "Resposta a mensagens privadas",
@@ -43,6 +47,7 @@ fases = [
     ),
     (
         "5️⃣ Relatórios",
+
         [
             "Alcance das publicações",
             "Crescimento de seguidores",

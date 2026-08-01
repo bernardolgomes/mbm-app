@@ -25,13 +25,11 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-c1, c2, c3 = st.columns(3)
+c1, c2 = st.columns(2)
 with c1:
-    st.link_button("📩 Pedir orçamento", "mailto:bernardo.lemos.gomes@gmail.com?subject=Pedido de orçamento", use_container_width=True)
-with c2:
     st.link_button("💬 Falar no WhatsApp", "https://wa.me/351967878262", use_container_width=True)
-with c3:
-    st.link_button("📅 Agendar reunião", "mailto:bernardo.lemos.gomes@gmail.com?subject=Agendar reunião", use_container_width=True)
+with c2:
+    st.link_button("📅 Agendar reunião", "mailto:mbm.mkt19@gmail.com?subject=Agendar reunião", use_container_width=True)
 
 st.markdown("---")
 
@@ -152,20 +150,6 @@ st.markdown(
 )
 
 # ---------------------------------------------------------------------------
-# TESTEMUNHOS
-# ---------------------------------------------------------------------------
-st.markdown("## Testemunhos")
-st.markdown(
-    """
-    <div class="card">
-        <p style="color:#6b7a70;">Ainda estamos a começar. Os primeiros testemunhos de
-        clientes vão aparecer aqui assim que tivermos os primeiros resultados documentados.</p>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
-
-# ---------------------------------------------------------------------------
 # CONTACTOS
 # ---------------------------------------------------------------------------
 st.markdown("## Contactos")
@@ -173,7 +157,7 @@ st.markdown(
     """
     <div class="card">
         <p>📞 <b>Telefone:</b> +351 967 878 262</p>
-        <p>📧 <b>E-mail:</b> bernardo.lemos.gomes@gmail.com</p>
+        <p>📧 <b>E-mail:</b> mbm.mkt19@gmail.com</p>
         <p>💬 <b>WhatsApp:</b> +351 967 878 262</p>
     </div>
     """,

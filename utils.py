@@ -536,11 +536,21 @@ def inject_css(accent: str):
             font-weight: 700;
             color: {COR_MARCA};
         }}
-        .stButton>button {{
-            background-color: {COR_MARCA_VERDE};
-            color: #ffffff;
-            border: none;
-            font-weight: 600;
+        .stButton>button,
+        div[data-testid="stLinkButton"] a,
+        div[data-testid="stDownloadButton"] button,
+        div[data-testid="stFormSubmitButton"] button {{
+            background-color: {COR_MARCA_VERDE} !important;
+            color: #ffffff !important;
+            border: none !important;
+            font-weight: 600 !important;
+        }}
+        .stButton>button:hover,
+        div[data-testid="stLinkButton"] a:hover,
+        div[data-testid="stDownloadButton"] button:hover,
+        div[data-testid="stFormSubmitButton"] button:hover {{
+            background-color: {COR_MARCA} !important;
+            color: #ffffff !important;
         }}
         .sidebar-label {{
             font-size: 0.72rem;
