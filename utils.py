@@ -644,14 +644,8 @@ def render_login(contexto: str = "sidebar"):
 
 
 def render_marca_sidebar():
-    """Mostra o logótipo e a missão/tagline em destaque no topo da sidebar, acima da
-    navegação. Chamar em app.py, ANTES de st.navigation(...)."""
-    logo = _logo_base64()
-    bloco_logo = (
-        f'<div style="text-align:center;"><img src="{logo}" style="max-width:150px;height:auto;display:inline-block;margin-bottom:10px;" /></div>'
-        if logo
-        else f'<div style="font-size:1.3rem;font-weight:800;color:{COR_MARCA_VERDE};margin-bottom:6px;text-align:center;">{NOME_NEGOCIO}</div>'
-    )
+    """Mostra a missão/tagline em destaque no topo da sidebar, acima da navegação
+    (estilo 'MONEY · MINDSET · FREEDOM'). Chamar em app.py, ANTES de st.navigation(...)."""
     st.markdown(
         f"""
         <style>
@@ -660,7 +654,6 @@ def render_marca_sidebar():
         }}
         </style>
         <div style="padding:0.5rem 1rem 0 1rem;">
-            {bloco_logo}
             <div style="font-size:0.78rem;font-weight:800;letter-spacing:0.08em;
                         text-transform:uppercase;color:{COR_TEXTO};line-height:1.4;margin-bottom:10px;">
                 {TAGLINE}
@@ -679,9 +672,9 @@ def render_marca_pagina(accent: str):
     if logo:
         st.markdown(
             f"""
-            <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
-                <img src="{logo}" style="height:64px;width:auto;" />
-                <span class="marca-nome" style="font-size:1.3rem;font-weight:800;color:{COR_MARCA_VERDE};">
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
+                <img src="{logo}" style="height:92px;width:auto;" />
+                <span class="marca-nome" style="font-size:1.5rem;font-weight:800;color:{COR_MARCA_VERDE};">
                     MBMarketing Digital
                 </span>
             </div>
