@@ -26,7 +26,9 @@ COR_FUNDO_LATERAL = "#EFE7D3"  # creme mais escuro (sidebar)
 COR_CARTAO = "#FFFFFF"      # branco
 COR_TEXTO = "#26332B"       # verde-carvão (texto principal)
 COR_MARCA = "#0F9D8C"       # turquesa (títulos, destaques)
-COR_MARCA_VERDE = "#1E8A5F"  # verde farmácia (botões, CTA)
+COR_MARCA_VERDE = "#1E8A5F"  # verde farmácia (títulos, marca)
+COR_BOTAO = "#3FB27F"       # verde mais claro, usado só nos botões (mais contraste com o texto)
+COR_BOTAO_HOVER = "#2E9C6C"  # tom um pouco mais escuro para o hover
 
 # ---------------------------------------------------------------------------
 # ARMAZENAMENTO LOCAL (calendário, fotos e clientes adicionados por ti)
@@ -561,7 +563,7 @@ def inject_css(accent: str):
         div[data-testid="stDownloadButton"] button *,
         div[data-testid="stFormSubmitButton"] button,
         div[data-testid="stFormSubmitButton"] button * {{
-            background-color: {COR_MARCA_VERDE} !important;
+            background-color: {COR_BOTAO} !important;
             color: #ffffff !important;
             border: none !important;
             font-weight: 600 !important;
@@ -574,7 +576,7 @@ def inject_css(accent: str):
         div[data-testid="stDownloadButton"] button:hover *,
         div[data-testid="stFormSubmitButton"] button:hover,
         div[data-testid="stFormSubmitButton"] button:hover * {{
-            background-color: {COR_MARCA} !important;
+            background-color: {COR_BOTAO_HOVER} !important;
             color: #ffffff !important;
         }}
         .sidebar-label {{
@@ -647,7 +649,7 @@ def render_login(contexto: str = "sidebar"):
             f"""
             <style>
             div.st-key-{chave_container} {{
-                background-color: {COR_MARCA_VERDE};
+                background-color: {COR_BOTAO};
                 border-radius: 10px;
                 padding: 14px 16px 6px 16px;
             }}
