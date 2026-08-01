@@ -648,9 +648,9 @@ def render_marca_sidebar():
     navegação. Chamar em app.py, ANTES de st.navigation(...)."""
     logo = _logo_base64()
     bloco_logo = (
-        f'<img src="{logo}" style="max-width:120px;height:auto;display:block;margin-bottom:10px;" />'
+        f'<div style="text-align:center;"><img src="{logo}" style="max-width:150px;height:auto;display:inline-block;margin-bottom:10px;" /></div>'
         if logo
-        else f'<div style="font-size:1.3rem;font-weight:800;color:{COR_MARCA_VERDE};margin-bottom:6px;">{NOME_NEGOCIO}</div>'
+        else f'<div style="font-size:1.3rem;font-weight:800;color:{COR_MARCA_VERDE};margin-bottom:6px;text-align:center;">{NOME_NEGOCIO}</div>'
     )
     st.markdown(
         f"""
@@ -679,8 +679,11 @@ def render_marca_pagina(accent: str):
     if logo:
         st.markdown(
             f"""
-            <div style="display:flex;align-items:center;margin-bottom:14px;">
-                <img src="{logo}" style="height:36px;width:auto;" />
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+                <img src="{logo}" style="height:64px;width:auto;" />
+                <span class="marca-nome" style="font-size:1.3rem;font-weight:800;color:{COR_MARCA_VERDE};">
+                    MBMarketing Digital
+                </span>
             </div>
             """,
             unsafe_allow_html=True,
