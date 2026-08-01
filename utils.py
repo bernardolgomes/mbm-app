@@ -35,6 +35,23 @@ DATA_DIR = Path(__file__).parent / "dados_clientes"
 DATA_DIR.mkdir(exist_ok=True)
 FICHEIRO_CLIENTES_EXTRA = DATA_DIR / "clientes.json"
 
+# ---------------------------------------------------------------------------
+# LOGÓTIPO
+# ---------------------------------------------------------------------------
+LOGO_FICHEIRO = Path(__file__).parent / "assets" / "logo.jpg"
+
+
+@st.cache_data
+def _logo_base64() -> str | None:
+    """Devolve o logótipo em base64 (para embutir em HTML), ou None se ainda não existir."""
+    if not LOGO_FICHEIRO.exists():
+        return None
+    import base64
+
+    tipo = "jpeg" if LOGO_FICHEIRO.suffix.lower() in (".jpg", ".jpeg") else "png"
+    conteudo = base64.b64encode(LOGO_FICHEIRO.read_bytes()).decode("utf-8")
+    return f"data:image/{tipo};base64,{conteudo}"
+
 
 def _slug(texto: str) -> str:
     """Transforma um texto num nome de pasta seguro."""
@@ -627,8 +644,14 @@ def render_login(contexto: str = "sidebar"):
 
 
 def render_marca_sidebar():
-    """Mostra a missão/tagline em destaque no topo da sidebar, acima da navegação
-    (estilo 'MONEY · MINDSET · FREEDOM'). Chamar em app.py, ANTES de st.navigation(...)."""
+    """Mostra o logótipo e a missão/tagline em destaque no topo da sidebar, acima da
+    navegação. Chamar em app.py, ANTES de st.navigation(...)."""
+    logo = _logo_base64()
+    bloco_logo = (
+        f'<img src="{logo}" style="max-width:120px;height:auto;display:block;margin-bottom:10px;" />'
+        if logo
+        else f'<div style="font-size:1.3rem;font-weight:800;color:{COR_MARCA_VERDE};margin-bottom:6px;">{NOME_NEGOCIO}</div>'
+    )
     st.markdown(
         f"""
         <style>
@@ -637,6 +660,7 @@ def render_marca_sidebar():
         }}
         </style>
         <div style="padding:0.5rem 1rem 0 1rem;">
+            {bloco_logo}
             <div style="font-size:0.78rem;font-weight:800;letter-spacing:0.08em;
                         text-transform:uppercase;color:{COR_TEXTO};line-height:1.4;margin-bottom:10px;">
                 {TAGLINE}
@@ -651,20 +675,31 @@ def render_marca_sidebar():
 def render_marca_pagina(accent: str):
     """Mostra o logótipo/nome da marca no topo de cada página de conteúdo
     (estilo o cabeçalho 'Freenomics' antes do título de cada página)."""
-    st.markdown(
-        f"""
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-            <div style="width:32px;height:32px;border-radius:8px;background:{COR_MARCA_VERDE};
-                        display:flex;align-items:center;justify-content:center;font-size:16px;">
-                📱
+    logo = _logo_base64()
+    if logo:
+        st.markdown(
+            f"""
+            <div style="display:flex;align-items:center;margin-bottom:14px;">
+                <img src="{logo}" style="height:36px;width:auto;" />
             </div>
-            <span class="marca-nome" style="font-size:1.1rem;font-weight:800;color:{COR_MARCA_VERDE};">
-                {NOME_NEGOCIO}
-            </span>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+            """,
+            unsafe_allow_html=True,
+        )
+    else:
+        st.markdown(
+            f"""
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+                <div style="width:32px;height:32px;border-radius:8px;background:{COR_MARCA_VERDE};
+                            display:flex;align-items:center;justify-content:center;font-size:16px;">
+                    📱
+                </div>
+                <span class="marca-nome" style="font-size:1.1rem;font-weight:800;color:{COR_MARCA_VERDE};">
+                    {NOME_NEGOCIO}
+                </span>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
 
 def garantir_cliente_valido():
