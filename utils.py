@@ -527,7 +527,11 @@ def inject_css(accent: str):
             color: {COR_TEXTO} !important;
         }}
         .marca-nome {{
-            color: {COR_MARCA_VERDE} !important;
+            background: linear-gradient(90deg, {COR_BOTAO_DE}, {COR_BOTAO_PARA}) !important;
+            -webkit-background-clip: text !important;
+            background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            color: transparent !important;
         }}
         section[data-testid="stSidebar"] hr {{
             margin: 10px 0;
@@ -754,7 +758,7 @@ def render_marca_pagina(accent: str):
             f"""
             <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
                 <img src="{logo}" style="height:92px;width:auto;" />
-                <span class="marca-nome" style="font-size:1.5rem;font-weight:800;color:{COR_MARCA_VERDE};">
+                <span class="marca-nome" style="font-size:1.5rem;font-weight:800;">
                     MBMarketing Digital
                 </span>
             </div>
@@ -769,7 +773,7 @@ def render_marca_pagina(accent: str):
                             display:flex;align-items:center;justify-content:center;font-size:16px;">
                     📱
                 </div>
-                <span class="marca-nome" style="font-size:1.1rem;font-weight:800;color:{COR_MARCA_VERDE};">
+                <span class="marca-nome" style="font-size:1.1rem;font-weight:800;">
                     {NOME_NEGOCIO}
                 </span>
             </div>
