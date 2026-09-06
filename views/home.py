@@ -82,8 +82,8 @@ for i, (icone, titulo, desc) in enumerate(servicos):
 st.markdown("## Porque escolher-nos")
 vantagens = [
     "Estratégias personalizadas para o teu setor",
-    "Conteúdos criativos, nunca genéricos",
-    "Publicações consistentes, sem falhas",
+    "Conteúdos criativos",
+    "Publicações consistentes",
     "Comunicação próxima e direta",
     "Relatórios claros de desempenho, todos os meses",
 ]
