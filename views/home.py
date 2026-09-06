@@ -124,7 +124,7 @@ st.markdown(
     """
     <div class="card">
         <div style="display:flex;align-items:flex-start;gap:16px;">
-            <div style="width:56px;height:56px;border-radius:50%;background:#1E8A5F;
+            <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#E91E8C,#7B3FF2);
                         display:flex;align-items:center;justify-content:center;font-size:1.6rem;
                         color:white;flex-shrink:0;">
                 BG

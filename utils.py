@@ -19,16 +19,21 @@ SENHA_ADMIN = "mbm2026"
 
 # ---------------------------------------------------------------------------
 # CORES DE MARCA (fixas, usadas em títulos, botões e destaques em toda a app)
-# Paleta inspirada em farmácia: creme + verde + turquesa
+# Paleta alinhada com o logótipo da MBM: fundo claro/neutro, texto azul-marinho
+# escuro, e destaques no gradiente rosa-magenta -> roxo do logo.
 # ---------------------------------------------------------------------------
-COR_FUNDO = "#F7F2E7"       # creme
-COR_FUNDO_LATERAL = "#EFE7D3"  # creme mais escuro (sidebar)
-COR_CARTAO = "#FFFFFF"      # branco
-COR_TEXTO = "#26332B"       # verde-carvão (texto principal)
-COR_MARCA = "#0F9D8C"       # turquesa (títulos, destaques)
-COR_MARCA_VERDE = "#1E8A5F"  # verde farmácia (títulos, marca)
-COR_BOTAO = "#3FB27F"       # verde mais claro, usado só nos botões (mais contraste com o texto)
-COR_BOTAO_HOVER = "#2E9C6C"  # tom um pouco mais escuro para o hover
+COR_FUNDO = "#F4F3F1"        # cinza muito claro (fundo do logo)
+COR_FUNDO_LATERAL = "#ECEAE6"  # tom um pouco mais escuro (sidebar)
+COR_CARTAO = "#FFFFFF"       # branco
+COR_TEXTO = "#12172B"        # azul-marinho escuro (texto principal, letras "M" do logo)
+COR_MARCA = "#7B3FF2"        # roxo do logo (títulos, destaques secundários)
+COR_MARCA_VERDE = "#E91E8C"  # rosa-magenta do logo (nome da marca, destaques fortes)
+COR_BOTAO_DE = "#E91E8C"     # início do gradiente dos botões (rosa-magenta)
+COR_BOTAO_PARA = "#7B3FF2"   # fim do gradiente dos botões (roxo)
+COR_BOTAO_HOVER_DE = "#C81577"  # gradiente do hover, mais escuro
+COR_BOTAO_HOVER_PARA = "#6425D9"
+COR_BOTAO = f"linear-gradient(90deg, {COR_BOTAO_DE}, {COR_BOTAO_PARA})"
+COR_BOTAO_HOVER = f"linear-gradient(90deg, {COR_BOTAO_HOVER_DE}, {COR_BOTAO_HOVER_PARA})"
 
 # ---------------------------------------------------------------------------
 # ARMAZENAMENTO LOCAL (calendário, fotos e clientes adicionados por ti)
@@ -285,7 +290,7 @@ def gerar_pdf_relatorio(cliente: str, dados_cliente: dict, historico: dict, insi
     # Gráfico de evolução de seguidores ao longo dos meses.
     fig, ax = plt.subplots(figsize=(6.4, 3))
     seguidores = [historico[m].get("seguidores", 0) for m in meses]
-    ax.plot(meses, seguidores, marker="o", color="#1E8A5F")
+    ax.plot(meses, seguidores, marker="o", color="#E91E8C")
     ax.set_ylabel("Seguidores")
     ax.set_xlabel("Mês")
     ax.grid(alpha=0.3)
@@ -296,11 +301,11 @@ def gerar_pdf_relatorio(cliente: str, dados_cliente: dict, historico: dict, insi
     plt.close(fig)
     buf.seek(0)
 
-    VERDE = (30, 138, 95)
-    TURQUESA = (15, 120, 105)
-    TEXTO_ESCURO = (38, 45, 40)
+    VERDE = (123, 63, 242)       # roxo do logo (cabeçalho do PDF)
+    TURQUESA = (123, 63, 242)    # roxo do logo (títulos de secção)
+    TEXTO_ESCURO = (18, 23, 43)  # azul-marinho escuro (texto principal)
     CINZA = (110, 110, 110)
-    FUNDO_CARTAO = (247, 242, 231)
+    FUNDO_CARTAO = (244, 243, 241)
 
     def _l1(txt: str) -> str:
         """Garante que o texto é seguro para o PDF (latin-1), sem perder acentos comuns."""
@@ -570,27 +575,27 @@ def inject_css(accent: str):
             color: {COR_MARCA};
         }}
         .stButton>button,
-        .stButton>button *,
         div[data-testid="stLinkButton"] a,
-        div[data-testid="stLinkButton"] a *,
         div[data-testid="stDownloadButton"] button,
-        div[data-testid="stDownloadButton"] button *,
-        div[data-testid="stFormSubmitButton"] button,
-        div[data-testid="stFormSubmitButton"] button * {{
-            background-color: {COR_BOTAO} !important;
+        div[data-testid="stFormSubmitButton"] button {{
+            background: {COR_BOTAO} !important;
             color: #ffffff !important;
             border: none !important;
             font-weight: 600 !important;
         }}
+        .stButton>button *,
+        div[data-testid="stLinkButton"] a *,
+        div[data-testid="stDownloadButton"] button *,
+        div[data-testid="stFormSubmitButton"] button * {{
+            background: transparent !important;
+            color: #ffffff !important;
+            font-weight: 600 !important;
+        }}
         .stButton>button:hover,
-        .stButton>button:hover *,
         div[data-testid="stLinkButton"] a:hover,
-        div[data-testid="stLinkButton"] a:hover *,
         div[data-testid="stDownloadButton"] button:hover,
-        div[data-testid="stDownloadButton"] button:hover *,
-        div[data-testid="stFormSubmitButton"] button:hover,
-        div[data-testid="stFormSubmitButton"] button:hover * {{
-            background-color: {COR_BOTAO_HOVER} !important;
+        div[data-testid="stFormSubmitButton"] button:hover {{
+            background: {COR_BOTAO_HOVER} !important;
             color: #ffffff !important;
         }}
         .sidebar-label {{
@@ -663,7 +668,7 @@ def render_login(contexto: str = "sidebar"):
             f"""
             <style>
             div.st-key-{chave_container} {{
-                background-color: {COR_BOTAO};
+                background: {COR_BOTAO};
                 border-radius: 10px;
                 padding: 14px 16px 6px 16px;
             }}
