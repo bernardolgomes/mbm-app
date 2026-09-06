@@ -40,18 +40,32 @@ FICHEIRO_CLIENTES_EXTRA = DATA_DIR / "clientes.json"
 # ---------------------------------------------------------------------------
 # LOGÓTIPO
 # ---------------------------------------------------------------------------
-LOGO_FICHEIRO = Path(__file__).parent / "assets" / "logo.jpg"
+PASTA_ASSETS = Path(__file__).parent / "assets"
+
+
+def _encontrar_logo() -> Path | None:
+    """Procura o ficheiro do logo na pasta assets/, seja qual for a extensão
+    (jpg, jpeg ou png), para não voltar a partir se o ficheiro for substituído
+    com um nome ligeiramente diferente."""
+    if not PASTA_ASSETS.exists():
+        return None
+    for extensao in ("jpg", "jpeg", "png", "JPG", "JPEG", "PNG"):
+        candidato = PASTA_ASSETS / f"logo.{extensao}"
+        if candidato.exists():
+            return candidato
+    return None
 
 
 @st.cache_data
 def _logo_base64() -> str | None:
     """Devolve o logótipo em base64 (para embutir em HTML), ou None se ainda não existir."""
-    if not LOGO_FICHEIRO.exists():
+    ficheiro = _encontrar_logo()
+    if not ficheiro:
         return None
     import base64
 
-    tipo = "jpeg" if LOGO_FICHEIRO.suffix.lower() in (".jpg", ".jpeg") else "png"
-    conteudo = base64.b64encode(LOGO_FICHEIRO.read_bytes()).decode("utf-8")
+    tipo = "jpeg" if ficheiro.suffix.lower() in (".jpg", ".jpeg") else "png"
+    conteudo = base64.b64encode(ficheiro.read_bytes()).decode("utf-8")
     return f"data:image/{tipo};base64,{conteudo}"
 
 
