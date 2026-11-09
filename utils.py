@@ -5,7 +5,7 @@ Funções e dados partilhados entre todas as páginas da demo.
 import json
 import os
 import re
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 
 import streamlit as st
@@ -74,6 +74,115 @@ def _logo_base64() -> str | None:
     return f"data:image/{tipo};base64,{conteudo}"
 
 
+@st.cache_data
+def _foto_fundador_base64() -> str | None:
+    """Foto do fundador (assets/bernardo.jpg, .jpeg, .png ou .webp), reduzida para
+    não pesar na página. Devolve None se o ficheiro ainda não existir."""
+    if not PASTA_ASSETS.exists():
+        return None
+    for extensao in ("jpg", "jpeg", "png", "webp", "JPG", "JPEG", "PNG"):
+        ficheiro = PASTA_ASSETS / f"bernardo.{extensao}"
+        if ficheiro.exists():
+            import base64
+            import io
+
+            from PIL import Image
+
+            img = Image.open(ficheiro).convert("RGB")
+            img.thumbnail((500, 500))
+            buf = io.BytesIO()
+            img.save(buf, "JPEG", quality=88)
+            return "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode("utf-8")
+    return None
+
+
+def avatar_fundador_html(tamanho: int = 120) -> str:
+    """HTML (numa só linha) do círculo com a foto do fundador; se ainda não houver
+    foto, mostra as iniciais 'BG' sobre o gradiente da marca."""
+    foto = _foto_fundador_base64()
+    if foto:
+        return (
+            f'<img src="{foto}" style="width:{tamanho}px;height:{tamanho}px;border-radius:50%;'
+            'object-fit:cover;object-position:center 20%;flex-shrink:0;border:3px solid #ffffff;'
+            'box-shadow:0 4px 14px rgba(18,23,43,0.18);" />'
+        )
+    return (
+        f'<div style="width:{tamanho}px;height:{tamanho}px;border-radius:50%;'
+        'background:linear-gradient(135deg,#E91E8C,#7B3FF2);display:flex;align-items:center;'
+        f'justify-content:center;font-size:{int(tamanho * 0.3)}px;color:white;flex-shrink:0;">BG</div>'
+    )
+
+
+# ---------------------------------------------------------------------------
+# CLIENTE FICTÍCIO DE DEMONSTRAÇÃO: é o que os visitantes veem. Os dados são
+# gerados aqui (não vêm do disco), por isso nunca se perdem nem expõem um cliente real.
+# ---------------------------------------------------------------------------
+DEMO_CLIENTE = "Farmácia Exemplo"
+
+
+def _e_demo(cliente: str) -> bool:
+    return cliente == DEMO_CLIENTE
+
+
+def _mes_atras(n: int) -> str:
+    hoje = date.today()
+    ano, mes = hoje.year, hoje.month - n
+    while mes <= 0:
+        mes += 12
+        ano -= 1
+    return f"{ano:04d}-{mes:02d}"
+
+
+def _estatisticas_demo() -> dict:
+    """6 meses fictícios (até ao mês passado), com uma evolução positiva realista."""
+    dados = {}
+    for i, n in enumerate(range(6, 0, -1)):
+        dados[_mes_atras(n)] = {
+            "seguidores": 820 + i * 52 + (i % 2) * 6,
+            "alcance": 2400 + i * 430 + (i % 3) * 120,
+            "impressoes": 4100 + i * 700 + (i % 2) * 200,
+            "engagement": round(2.4 + i * 0.35 - (i % 2) * 0.1, 1),
+            "novos_seguidores": 18 + i * 9 + (i % 2) * 4,
+            "visitas_perfil": 150 + i * 28,
+            "cliques_link": 22 + i * 7,
+            "mensagens": 4 + i * 2,
+        }
+    return dados
+
+
+def _calendario_demo() -> dict:
+    """Calendário fictício: post à terça, story à quinta (plano Business, 4+4 por mês)."""
+    cal = {}
+    d = date.today() - timedelta(days=180)
+    fim = date.today() + timedelta(days=90)
+    n_tercas = 0
+    while d <= fim:
+        if d.weekday() == 1:
+            n_tercas += 1
+            if n_tercas % 4 == 0:
+                cal[d.isoformat()] = "🎉 Promoção"
+            elif n_tercas % 3 == 0:
+                cal[d.isoformat()] = "🎬 Reel"
+            else:
+                cal[d.isoformat()] = "📸 Post"
+        elif d.weekday() == 3:
+            cal[d.isoformat()] = "📝 Story"
+        d += timedelta(days=1)
+    return cal
+
+
+def _fotos_demo(categoria: str) -> list[Path]:
+    """Reaproveita uma imagem do portefólio de mockups de farmácia para cada legenda."""
+    imagens: list[Path] = []
+    for negocio in ("Farmácia 1", "Farmácia 2"):
+        pasta = DATA_DIR / "_portefolio" / _slug(negocio)
+        if pasta.exists():
+            imagens += sorted(p for p in pasta.glob("*") if p.is_file())
+    if not imagens:
+        return []
+    return [imagens[sum(ord(c) for c in categoria) % len(imagens)]]
+
+
 def _slug(texto: str) -> str:
     """Transforma um texto num nome de pasta seguro."""
     return re.sub(r"[^a-z0-9]+", "-", texto.lower()).strip("-")
@@ -86,6 +195,8 @@ def cliente_dir(cliente: str) -> Path:
 
 
 def carregar_calendario(cliente: str) -> dict:
+    if _e_demo(cliente):
+        return _calendario_demo()
     ficheiro = cliente_dir(cliente) / "calendario.json"
     if ficheiro.exists():
         return json.loads(ficheiro.read_text(encoding="utf-8"))
@@ -93,12 +204,16 @@ def carregar_calendario(cliente: str) -> dict:
 
 
 def guardar_calendario(cliente: str, calendario: dict):
+    if _e_demo(cliente):
+        return  # o cliente de demonstração é só de leitura
     ficheiro = cliente_dir(cliente) / "calendario.json"
     ficheiro.write_text(json.dumps(calendario, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 def listar_fotos(cliente: str, categoria: str) -> list[Path]:
     """Lista as fotos guardadas dentro de uma categoria/legenda específica."""
+    if _e_demo(cliente):
+        return _fotos_demo(categoria)
     pasta = cliente_dir(cliente) / "fotos" / _slug(categoria)
     if not pasta.exists():
         return []
@@ -143,6 +258,8 @@ INDICADORES_INTEIROS = {
 
 def carregar_estatisticas(cliente: str) -> dict:
     """Devolve {"AAAA-MM": {indicador: valor, ...}, ...} guardado para este cliente."""
+    if _e_demo(cliente):
+        return _estatisticas_demo()
     ficheiro = cliente_dir(cliente) / "estatisticas.json"
     if ficheiro.exists():
         return json.loads(ficheiro.read_text(encoding="utf-8"))
@@ -150,6 +267,8 @@ def carregar_estatisticas(cliente: str) -> dict:
 
 
 def guardar_estatisticas(cliente: str, historico: dict):
+    if _e_demo(cliente):
+        return  # o cliente de demonstração é só de leitura
     ficheiro = cliente_dir(cliente) / "estatisticas.json"
     ficheiro.write_text(json.dumps(historico, ensure_ascii=False, indent=2), encoding="utf-8")
 
@@ -455,6 +574,15 @@ CLIENTES_BASE = {
         "stories_mes": 4,
         "real": True,
         "senha": "carvoeiro2026",
+    },
+    DEMO_CLIENTE: {
+        "cor": "#7B3FF2",
+        "nicho": "Farmácia",
+        "plano": "Business",
+        "desde": "Jan 2026",
+        "posts_mes": 4,
+        "stories_mes": 4,
+        "demo": True,
     },
 }
 
@@ -786,6 +914,10 @@ def garantir_cliente_valido():
     """Garante que existe sempre um cliente válido em session_state. Chamar cedo em cada rerun."""
     clientes = todos_clientes()
     bloqueado = st.session_state.get("cliente_bloqueado")
+    if not pode_editar():
+        # Visitantes só veem o cliente fictício de demonstração.
+        st.session_state.cliente = DEMO_CLIENTE
+        return
     if "cliente" not in st.session_state or st.session_state.cliente not in clientes:
         st.session_state.cliente = bloqueado or list(clientes.keys())[0]
 
@@ -799,14 +931,11 @@ def render_cliente_selector():
 
     if not pode_editar():
         # Visitante sem sessão: só vê o cliente de demonstração, em modo leitura.
-        demo_cliente = next(
-            (nome for nome, dados in CLIENTES_BASE.items() if dados.get("real")),
-            list(CLIENTES_BASE.keys())[0],
-        )
+        demo_cliente = DEMO_CLIENTE
         st.session_state.cliente = demo_cliente
         st.markdown('<div class="sidebar-label">A ver (demonstração)</div>', unsafe_allow_html=True)
         st.markdown(f"**{demo_cliente}**")
-        st.caption("Inicia sessão para ver a área de um cliente específico.")
+        st.caption("Dados fictícios, só para demonstrar o serviço. Inicia sessão para aceder à tua área.")
         return
 
     if bloqueado:
@@ -878,6 +1007,8 @@ def render_header(cliente: str, dados: dict, accent: str):
         if dados.get("real")
         else ""
     )
+    if dados.get("demo"):
+        selo_real = '<span class="pill">🧪 Cliente de exemplo</span>'
     linha_info = (
         f'<span class="pill">{dados["nicho"]}</span>'
         f'<span class="pill">{dados["plano"]}</span>'

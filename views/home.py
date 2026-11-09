@@ -1,5 +1,5 @@
 import streamlit as st
-from utils import NOME_NEGOCIO, setup_page, render_login
+from utils import NOME_NEGOCIO, setup_page, render_login, avatar_fundador_html
 
 cliente, dados, accent = setup_page("Início", mostrar_cliente=False)
 
@@ -43,7 +43,7 @@ st.markdown(
         <p>Ajudamos negócios locais (farmácias, restaurantes, ginásios, clínicas e alojamentos locais) a
         fortalecer a sua presença digital através da gestão de redes sociais, criação de
         conteúdo e planeamento estratégico feito à medida de cada negócio.</p>
-        <p>Nada de conteúdo genérico: cada plano é pensado para o setor e o público do
+        <p>Cada plano é pensado para o setor e o público do
         cliente, com um calendário alinhado às épocas e temas que realmente interessam.</p>
     </div>
     """,
@@ -120,32 +120,29 @@ for c, (num, titulo, desc) in zip(cols, passos):
 # QUEM SOU (FUNDADOR)
 # ---------------------------------------------------------------------------
 st.markdown("## Quem sou")
+_competencias = ["SQL", "Python", "Power BI", "Looker Studio", "Excel", "Canva"]
+_pills = "".join(f'<span class="pill">{c}</span>' for c in _competencias)
 st.markdown(
-    """
-    <div class="card">
-        <div style="display:flex;align-items:flex-start;gap:16px;">
-            <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#E91E8C,#7B3FF2);
-                        display:flex;align-items:center;justify-content:center;font-size:1.6rem;
-                        color:white;flex-shrink:0;">
-                BG
-            </div>
-            <div>
-                <b style="font-size:1.05rem;">Bernardo Lemos Gomes</b>
-                <p style="color:#6b7a70;font-size:0.85rem;margin-top:-4px;">Fundador do MBM</p>
-                <p>Tenho formação em Gestão Aplicada pela Católica Lisbon School of Business &
-                Economics e um bootcamp de Data Analytics pelo Le Wagon, onde trabalho com
-                análise de dados, estratégia e ferramentas de visualização como Power BI e
-                Looker Studio. Antes disso, geri as operações de um clube de padel, onde ajudei
-                a multiplicar a faturação mensal, uma experiência que me mostrou o impacto real
-                que uma boa gestão e comunicação têm num negócio local.</p>
-                <p>Junto essa visão analítica e orientada a resultados à criação de conteúdo.
-                Também crio conteúdo próprio no YouTube sobre finanças e mentalidade, para
-                ajudar negócios como o teu a crescerem nas redes sociais de forma consistente
-                e mensurável.</p>
-            </div>
-        </div>
-    </div>
-    """,
+    '<div class="card">'
+    '<div style="display:flex;align-items:flex-start;gap:22px;flex-wrap:wrap;">'
+    f'{avatar_fundador_html(130)}'
+    '<div style="flex:1;min-width:260px;">'
+    '<b style="font-size:1.15rem;">Bernardo Lemos Gomes</b>'
+    '<p style="color:#6b7a70;font-size:0.85rem;margin-top:-4px;">Fundador da MBM</p>'
+    '<p>Sou mestre em Gestão Aplicada (Digital Innovation) pela Católica Lisbon School of '
+    'Business &amp; Economics e fiz um bootcamp de Data Analytics no Le Wagon, onde trabalhei '
+    'com SQL, Python, Power BI e Looker Studio. Tenho também experiência em análise financeira '
+    'e avaliação de empresas, adquirida na 3 Comma Capital.</p>'
+    '<p>Antes disso, fui treinador e gestor de operações num clube de padel em Sintra. '
+    'Melhorei a gestão de reservas, faturação e relação com os clientes e contribuí para um '
+    'aumento de 470% na faturação mensal. Foi aí que vi, na prática, o impacto que uma boa '
+    'gestão e comunicação têm num negócio local.</p>'
+    '<p>Fui também atleta de ténis de alto rendimento no circuito ITF, o que me deu disciplina '
+    'e foco em resultados. Hoje junto essa mentalidade à análise de dados e à criação de '
+    'conteúdo (tenho um canal de YouTube sobre finanças e mentalidade) para ajudar negócios '
+    'locais a crescerem nas redes sociais de forma consistente e mensurável.</p>'
+    f'<div style="margin-top:6px;">{_pills}</div>'
+    '</div></div></div>',
     unsafe_allow_html=True,
 )
 

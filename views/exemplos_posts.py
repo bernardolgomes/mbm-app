@@ -2,7 +2,7 @@ import streamlit as st
 from utils import setup_page, listar_fotos, guardar_foto, apagar_foto, pode_editar
 
 cliente, dados, accent = setup_page("Exemplos de Posts")
-editavel = pode_editar()
+editavel = pode_editar() and not dados.get("demo")
 
 st.markdown("# Exemplos de Posts")
 st.write(f"Sugestões de conteúdo para **{cliente}**. Envia fotos para cada tipo de publicação.")

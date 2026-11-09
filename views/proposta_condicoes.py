@@ -14,8 +14,8 @@ with col1:
         """
         <div class="card">
             <span class="pill">Starter / Basic</span>
-            <h2 class="accent">150€ <span style="font-size:1rem;color:#7c8aa8;">/mês</span></h2>
-            <p>2 publicações + 2 stories/mês</p>
+            <h2 class="accent">195€ <span style="font-size:1rem;color:#7c8aa8;">/mês</span></h2>
+            <p>4 publicações + 4 stories/mês</p>
             <p>✅ 1 rede social (Instagram)</p>
             <p>✅ Design simples e textos</p>
             <p>✅ Agendamento e publicação</p>
@@ -31,8 +31,8 @@ with col2:
         """
         <div class="card">
             <span class="pill">Business</span>
-            <h2 class="accent">225€ <span style="font-size:1rem;color:#7c8aa8;">/mês</span></h2>
-            <p>4 publicações + 4 stories/mês</p>
+            <h2 class="accent">250€ <span style="font-size:1rem;color:#7c8aa8;">/mês</span></h2>
+            <p>6 publicações + 6 stories/mês</p>
             <p>✅ 2 redes sociais (Instagram + Facebook)</p>
             <p>✅ 1 segmentação de clientes</p>
             <p>✅ Design profissional e copywriting</p>
@@ -50,7 +50,7 @@ with col3:
         <div class="card" style="border-color:{accent};border-width:2px;">
             <span class="pill">Premium ⭐ Mais procurado</span>
             <h2 class="accent">350€ <span style="font-size:1rem;color:#7c8aa8;">/mês</span></h2>
-            <p>6 publicações + 6 stories/mês</p>
+            <p>10 publicações + 10 stories/mês</p>
             <p>✅ 2 redes sociais (Instagram + Facebook)</p>
             <p>✅ 3 segmentações de clientes</p>
             <p>✅ Design profissional + vídeo/reels</p>

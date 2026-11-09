@@ -4,11 +4,13 @@ import calendar as cal
 from utils import setup_page, carregar_calendario, guardar_calendario, pode_editar
 
 cliente, dados, accent = setup_page("Calendário de Publicação")
-editavel = pode_editar()
+editavel = pode_editar() and not dados.get("demo")
 
 st.markdown("# Calendário de Publicação")
 if editavel:
     st.write("Escolhe o mês e o tipo de conteúdo para cada dia. Fica tudo gravado por cliente.")
+elif dados.get("demo"):
+    st.write("Exemplo de um calendário mensal de publicações (dados fictícios).")
 else:
     st.write("A ver em modo visitante. Inicia sessão para editar o calendário.")
 st.markdown("")

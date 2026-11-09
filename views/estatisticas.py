@@ -36,7 +36,7 @@ historico = carregar_estatisticas(cliente)
 # ---------------------------------------------------------------------------
 # ADMIN: introduzir/atualizar os números do mês
 # ---------------------------------------------------------------------------
-if e_admin():
+if e_admin() and not dados.get("demo"):
     with st.expander("✏️ Atualizar números deste mês (admin)"):
         hoje = date.today()
         col_m, col_a = st.columns(2)
@@ -155,7 +155,7 @@ for chave, label, _ in INDICADORES:
     formato = "%.1f" if chave == "engagement" else "%d"
     configuracao_colunas[label] = st.column_config.NumberColumn(label, format=formato)
 
-if e_admin():
+if e_admin() and not dados.get("demo"):
     st.caption(
         "Podes corrigir os valores diretamente na tabela. Para remover um mês, seleciona "
         "a linha (à esquerda) e clica no ícone de lixo que aparece por cima da tabela."
