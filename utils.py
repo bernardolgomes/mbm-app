@@ -172,13 +172,8 @@ def _calendario_demo() -> dict:
 
 
 def _fotos_demo(categoria: str) -> list[Path]:
-    """Reaproveita uma imagem do portefólio de mockups de farmácia para cada legenda."""
-    imagens: list[Path] = []
-    for negocio in ("Farmácia 1", "Farmácia 2"):
-        imagens += listar_mockups(negocio)
-    if not imagens:
-        return []
-    return [imagens[sum(ord(c) for c in categoria) % len(imagens)]]
+    """O cliente de demonstração não mostra fotos nos Exemplos de Posts."""
+    return []
 
 
 def _slug(texto: str) -> str:
