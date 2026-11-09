@@ -1,4 +1,13 @@
+import importlib
+
 import streamlit as st
+
+import utils
+
+# No Streamlit Cloud, depois de um push o utils.py pode ficar em memória na versão
+# antiga (e as páginas novas falham com ImportError). Recarregar garante que é sempre o atual.
+importlib.reload(utils)
+
 from utils import NOME_NEGOCIO, render_marca_sidebar, render_cliente_selector, render_login, login_gate
 
 st.set_page_config(
