@@ -79,11 +79,11 @@ st.markdown(
 )
 
 st.markdown("")
-st.markdown("### 🎉 Campanha de lançamento")
+st.markdown("### 🎉 Futuro")
 st.markdown(
     """
     <div class="card">
-    <p>Para as <b>primeiras 10 angariações</b>: desconto de <b>75€ trimestral</b>.</p>
+
     </div>
     """,
     unsafe_allow_html=True,
